@@ -1,0 +1,27 @@
+<div class="ui segment">
+  <strong>Legend</strong>
+  <div class="ui inverted label">Rejected</div>
+  <div class="ui teal label">Unpaid</div>
+  <div class="ui label">Inactive Unselected</div>
+  <div class="ui orange label">Inactive Selected</div>
+  <div class="ui red label">Active</div>
+  <div class="ui green label">Completed</div>
+  <div class="ui blue label">Approved</div>
+</div>
+<div class="ui segment">
+  <mat-form-field>
+    <mat-label>Category</mat-label>
+    <mat-select>
+      <mat-option ></mat-option>
+    </mat-select>
+  </mat-form-field>
+</div>
+<div class="ui segment">
+  <div *ngFor="let task of tasks; let i = index" class="ui image label" style="margin-bottom: 5px"
+    ng-class="getColor(task)" title="{{ task.insertedAt | date : 'dd - MMM hh:mm a' }}">
+    {{ i + 1 }} ({{ task.id }}) {{ task.customerName }}
+    <div class="detail" [hidden]="task.acceptedBy===0">
+      {{ task.acceptedByUser }}
+    </div>
+  </div>
+</div>

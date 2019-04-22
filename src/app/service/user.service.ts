@@ -1,0 +1,31 @@
+import { MySQLService } from './my-sql.service';
+import { User } from './../class/user';
+import { Injectable, OnInit } from '@angular/core';
+
+@Injectable({
+  providedIn: 'root'
+})
+export class UserService {
+  private users: Array<User> = [];
+  currentUser: User = new User(0, 'Anonymous', 0);
+
+  constructor(private mySql: MySQLService) {
+    this.mySql.select('users').subscribe((response: Array<User>) => {
+      Array.from(response).forEach((item: User) => {
+        this.users.push(new User(+item.id, item.name, +item.authLevel));
+      });
+    });
+  }
+
+  get(id: number): User {
+    return this.users.find(x => +x.id === +id);
+  }
+
+  isLoggedIn() {
+    return this.currentUser.id > 0;
+  }
+
+  getAll(): Array<User> {
+    return this.users;
+  }
+}

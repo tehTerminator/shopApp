@@ -1,0 +1,43 @@
+<div class="ui two column grid">
+  <div class="six wide column">
+    <table class="ui selectable compact table segment">
+      <thead>
+        <tr>
+          <th>#</th>
+          <th>Name</th>
+          <th>Rate</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr *ngFor="let b of batch" (click)="selectBatch(b)">
+          <td>{{ b.id }}</td>
+          <td>{{ b.title }}</td>
+          <td>{{ b.rate }}</td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+  <div class="ten wide column">
+    <h3 class="ui header">
+      Settings
+    </h3>
+    <div class="ui three column stackable grid">
+      <div class="column" *ngFor="let setting of selectedBatch.settings">
+        <table class="ui compact small table segment">
+          <thead>
+            <th>KEY</th>
+            <th>VALUE</th>
+          </thead>
+          <tbody>
+            <tr *ngFor="let obj of objectKeys(setting)">
+              <td>{{ obj }}</td>
+              <td>{{ setting[obj] }}</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+</div>
+<hr>
+<app-directory-table></app-directory-table>

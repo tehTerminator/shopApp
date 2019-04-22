@@ -1,0 +1,182 @@
+import { ProductTransaction } from './../interface/product-transaction';
+import { Task } from './../interface/task';
+import { Injectable } from '@angular/core';
+import { MySQLService } from './my-sql.service';
+import { CashTransaction } from '../interface/cash-transaction';
+import { NotificationService } from './notification.service';
+import { DirectoryService } from './directory.service';
+
+@Injectable({
+  providedIn: 'root',
+})
+export class BatchService {
+  task: Task;
+  productTran: Array<ProductTransaction> = [];
+  cashTran: Array<CashTransaction> = [];
+
+  constructor(
+    private mysql: MySQLService,
+    private notice: NotificationService,
+    private ds: DirectoryService) {
+    this.task = {
+      customerName: '',
+      insertedBy: 0,
+      amountCollected: 0,
+      status: 'INACTIVE',
+      category_id: 0
+    };
+  }
+
+  public set(theTask: Task, cashT: Array<CashTransaction>, prodT: Array<ProductTransaction>): void {
+    this.task = theTask;
+    this.cashTran = cashT;
+    this.productTran = prodT;
+  }
+
+  public save(): void {
+    if (this.task.category_id > 0) {
+      this.saveTask();
+    } else {
+      this.equalizeCashBook();
+      this.saveProducts();
+    }
+  }
+
+  /**
+   * Saves Task Details
+   */
+  private saveTask(): void {
+    delete (this.task.id);
+    if (this.task.status === 'COMPLETED') {
+      this.task.acceptedBy = this.task.insertedBy;
+      this.task.completedAt = this.toMySqlDateFormat(new Date());
+    }
+    this.mysql.insert('task', {
+      userData: this.task
+    }, true).subscribe((res: any) => {
+      this.task.id = res.lastInsertId;
+      const message = `${this.task.customerName}. Inserted successfully`;
+      this.notice.changeMessage({ id: this.task.id, text: message, status: 'green' });
+      this.saveProducts();
+      if (this.task.amountCollected > 0) {
+        this.saveCashBookEntry();
+      }
+    });
+  }
+
+  /**
+   * Saves the Product Transaction
+   */
+  private saveProducts(): void {
+    if (this.areTransactionEmpty(this.productTran)) {
+      return;
+    } else {
+      Array.from(this.productTran).forEach((item: ProductTransaction) => {
+        const message = `Inserted ${item.productName} for Rs.${item.amount}`;
+        delete (item.id);
+        delete (item.productName);
+        delete (item.amount);
+        if (item.quantity > 0) {
+          this.mysql.insert('productUsage', {
+            userData: item
+          }).subscribe(() => {
+            this.notice.changeMessage({
+              text: message,
+              status: 'positive'
+            });
+          });
+        }
+      });
+      this.saveCashBookEntry();
+    }
+  }
+
+  /**
+   * This Method Equalises Product Transaction Amount And Sales Amount
+   * If there is any other Cashbook Transaction Involved then also amount is calculated.
+   */
+  private equalizeCashBook(): void {
+    if (this.productTran.length > 0) {
+      // if there is only on transaction then full amount is from sales Account
+      const prodTransTotal = this.getTotal(this.productTran);
+      const salesAccountId = this.ds.find('sales').id;
+      if (this.cashTran.length === 0) {
+        this.cashTran[0].amount = prodTransTotal;
+        console.log(this.cashTran, prodTransTotal, salesAccountId);
+      } else {
+        // If there are multiple cashbook transaction then the sales amount is calculated by
+        // deducting the sum of amount of transactions except Sales account from total Product Transaction Amount
+        // rest is saved in Sales Transaction amount
+        const salesTransaction = this.cashTran.find(x => x.giver_id === salesAccountId);
+        const difference = this.getTotal(this.cashTran) - salesTransaction.amount;
+        salesTransaction.amount = prodTransTotal - difference;
+        console.log(salesTransaction);
+      }
+    }
+  }
+
+  private areTransactionEmpty(transactionArray: Array<any>): boolean {
+    let total = 0;
+    Array.from(transactionArray).forEach((item: any) => {
+      total += +item.amount;
+    });
+    return total === 0;
+  }
+
+  private saveCashBookEntry(): void {
+    if (this.areTransactionEmpty(this.cashTran)) {
+      return;
+    } else {
+      Array.from(this.cashTran).forEach((item: CashTransaction) => {
+        if (item.amount > 0) {
+          delete (item.id);
+          delete (item.giver);
+          delete (item.receiver);
+          delete (item.userName);
+          this.mysql.insert('cashbook', { userData: item }, true)
+            .subscribe((res: any) => {
+              console.log(res);
+              item.id = res.lastInsertId;
+              this.linkTaskAndCashBook(this.task.id, item.id);
+            });
+        }
+      });
+    }
+  }
+
+  private linkTaskAndCashBook(taskId: number, cashbookId: number) {
+    if (taskId > 0) {
+      this.mysql.insert('taskCashbook', {
+        userData: {
+          task_id: taskId,
+          cashbook_id: cashbookId
+        }
+      }, true).subscribe((res: any) => {
+        console.log(res);
+      });
+    }
+  }
+
+  private getTotal(transactionArray: Array<any>): number {
+    let total = 0;
+    transactionArray.forEach((item: any) => {
+      try {
+        total += item.amount;
+      } catch (e) {
+        total += 0;
+      }
+    });
+    return total;
+  }
+
+  private toMySqlDateFormat(theDate: Date): string {
+    // tslint:disable-next-line:max-line-length
+    return `${theDate.getFullYear()}-${this.pad(theDate.getMonth() + 1, 2)}-${this.pad(theDate.getDate(), 2)} ${this.pad(theDate.getHours(), 2)}:${this.pad(theDate.getMinutes(), 2)}:${this.pad(theDate.getSeconds, 2)}`;
+  }
+
+  private pad(num, size) {
+    var s = "000000000" + num;
+    return s.substr(s.length - size);
+  }
+
+}

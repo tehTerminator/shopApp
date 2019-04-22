@@ -1,0 +1,41 @@
+<div class="ui top attached menu">
+  <div class="header item">
+    Date
+  </div>
+  <div class="item">
+    <div class="ui transparent input">
+      <input type="date" name="postedOn" [(ngModel)]="postedOn">
+    </div>
+  </div>
+  <a class="item" (click)="get()">
+    Refresh
+  </a>
+</div>
+<table class="ui attached compact table segment">
+  <thead>
+    <tr>
+      <th>#</th>
+      <th>Posted On</th>
+      <th>Giver</th>
+      <th>Receiver</th>
+      <th>Amount</th>
+      <th>Description</th>
+      <th>Status</th>
+      <th>Inserted By</th>
+      <th>Action</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr *ngFor="let t of transactions">
+      <td>{{ t.id }}</td>
+      <td>{{ t.postedOn | date:'hh:mm:ss aa' }}</td>
+      <td>{{ t.giver }}</td>
+      <td>{{ t.receiver }}</td>
+      <td>{{ t.amount }}</td>
+      <td>{{ t.description }}</td>
+      <td>{{ t.status }}</td>
+      <td>{{ t.userName }}</td>
+      <td>None</td>
+    </tr>
+  </tbody>
+</table>
