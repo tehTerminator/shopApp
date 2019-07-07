@@ -20,6 +20,7 @@ export class LiveViewComponent implements OnInit, OnDestroy {
   selectedCategory: string;
   searchText: string;
   selectedState: string;
+  slotBased = true;
 
 
   constructor(
@@ -39,30 +40,62 @@ export class LiveViewComponent implements OnInit, OnDestroy {
   ngOnDestroy() {
     if (this.timerSubscription) {
       this.timerSubscription.unsubscribe();
-      console.log('Timer No More');
     }
   }
 
   get(): void {
-    const request = {
-      andWhere: {
-        'DATE(insertedAt)': this.theDate,
-        state: this.selectedState,
-        category_id: this.selectedCategory
+    let request: {[k: string]: any} = {};
+    let tableName = 'task';
+
+    if (this.slotBased) {
+      tableName = 'bookings';
+      request = {
+        columns: ['bookings.task_id AS id',
+          'bookings.forDate as forDate',
+          'task.customerName',
+          'task.insertedAt',
+          'task.acceptedBy',
+          'task.amountCollected',
+          'task.category_id',
+          'task.comment',
+          'task.completedAt',
+          'task.insertedBy',
+          'task.state'],
+        join: 'task ON task.id = bookings.task_id',
+        andWhere: {
+          'bookings.forDate' : this.theDate,
+          'task.state': this.selectedState,
+          'task.category_id': this.selectedCategory
+        }
+      };
+
+      if (this.selectedState === undefined || +this.selectedState.length === 0) {
+        delete (request.andWhere['task.state']);
       }
-    };
 
-    if (this.selectedState === undefined || +this.selectedState.length === 0) {
-      delete( request.andWhere.state );
+      if (this.selectedCategory === undefined || +this.selectedCategory.length === 0) {
+        delete (request.andWhere['task.category_id']);
+      }
+    } else {
+      request = {
+        andWhere: {
+          'DATE(insertedAt)': this.theDate,
+          state: this.selectedState,
+          category_id: this.selectedCategory
+        }
+      };
+      if (this.selectedState === undefined || +this.selectedState.length === 0) {
+        delete (request.andWhere.state);
+      }
+      if (this.selectedCategory === undefined || +this.selectedCategory.length === 0) {
+        delete (request.andWhere.category_id);
+      }
     }
-
-    if (this.selectedCategory === undefined || +this.selectedCategory.length === 0) {
-      delete(request.andWhere.category_id);
-    }
-
-    this.mysql.select('task', request).subscribe((res: any) => {
+    this.mysql.select(tableName, request, true).subscribe((res: any) => {
       this.tasks = [];
-      Array.from(res).forEach((item: Task) => {
+      console.log(res);
+      Array.from(res.rows).forEach((item: Task) => {
+        delete(item.forDate);
         item.categoryName = this.directory.get(item.category_id).name;
         this.pushItem(item);
       });
@@ -110,5 +143,10 @@ export class LiveViewComponent implements OnInit, OnDestroy {
       task.acceptedByUser = new User(0, '', 0);
     }
     this.tasks.push(task);
+  }
+
+  toggleRequest() {
+    this.slotBased = !this.slotBased;
+    this.get();
   }
 }

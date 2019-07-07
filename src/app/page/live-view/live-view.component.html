@@ -1,9 +1,21 @@
-<app-task-counter></app-task-counter>
 <div class="ui three column grid">
 	<div class="four wide column">
 		<app-task-entry-form></app-task-entry-form>
 		<hr>
 		<app-assign-task></app-assign-task>
+		<hr>
+		<!-- Legends :: START::-->
+		<div class="ui top attached inverted header">Legends</div>
+		<div class="ui bottom attached raised segment">
+			<div class="ui basic red label">Rejected</div>
+			<div class="ui teal label">Unpaid</div>
+			<div class="ui label">Inactive Unselected</div>
+			<div class="ui orange label">Inactive Selected</div>
+			<div class="ui red label">Active</div>
+			<div class="ui green label">Completed</div>
+			<div class="ui blue label">Approved</div>
+		</div>
+		<!-- Legends :: END::-->
 	</div>
 	<div class="four wide column">
 		<!-- Filter Form :: Start ::-->
@@ -46,20 +58,13 @@
 					</select>
 				</div>
 			</div>
+			<button class="ui blue fluid button" (click)="toggleRequest()">
+				{{ slotBased ? 'Slot Based' : 'Insert Date Based' }}
+			</button>
 		</div>
 		<!-- Filter Form :: END :: -->
-		<!-- Legends :: START::-->
-		<div class="ui top attached inverted header">Legends</div>
-		<div class="ui bottom attached raised segment">
-			<div class="ui basic red label">Rejected</div>
-			<div class="ui teal label">Unpaid</div>
-			<div class="ui label">Inactive Unselected</div>
-			<div class="ui orange label">Inactive Selected</div>
-			<div class="ui red label">Active</div>
-			<div class="ui green label">Completed</div>
-			<div class="ui blue label">Approved</div>
-		</div>
-		<!-- Legends :: END::-->
+		<app-slot-view></app-slot-view>
+		
 	</div>
 	<div class="eight wide column">
 		<div class="ui scrollable segment">

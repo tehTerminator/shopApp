@@ -14,4 +14,5 @@ export interface Task {
     state: string;
     comment?: string;
     match?: boolean;
+    forDate?: string;
 }
