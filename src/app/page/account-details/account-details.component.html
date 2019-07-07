@@ -1,6 +1,6 @@
 <div class="ui two column grid">
   <div class="four wide column">
-    <button class="ui fluid button" (click)="toggleRange()">
+    <button class="ui fluid teal button" (click)="toggleRange()">
       {{ singleDay ? 'Single Day' : 'Multiple Day'}}
     </button>
     <div class="ui form segment">
@@ -14,49 +14,66 @@
       </div>
       <div class="field">
         <label for="accountId">Account</label>
-        <select name="" [(ngModel)]="selectedAccount" (change)="get()">
+        <select name="" [(ngModel)]="selectedAccount">
           <option value='0' selected="selected">Select Account</option>
           <option *ngFor="let account of directory.getAccounts()" [value]="account.id">{{ account.name }}</option>
         </select>
       </div>
       <hr>
-      <button class="ui fluid button" (click)="get()">Show</button>
+      <button class="ui fluid blue button" (click)="get()">Show</button>
     </div>
     <hr>
     <app-cash-book-form></app-cash-book-form>
+    <hr>
+    <div class="ui fluid action input">
+      <input type="text" name="checkAmount" [(ngModel)]="checkCommand">
+      <button class="ui blue button" (click)="check()">Submit</button>
+    </div>
   </div>
-  <div class="twelve wide scrollable column">
-    <h2 class="ui center aligned header" [hidden]="transactions.length > 0">No Transactions Details</h2>
-    <table class="ui mini compant celled table" [hidden]="transactions.length === 0">
-      <thead>
-        <th>#</th>
-        <th>Time</th>
-        <th>Description</th>
-        <th>Transfer</th>
-        <th>Amount</th>
-        <th>Balance</th>
-      </thead>
-      <tbody>
-        <tr *ngFor="let t of transactions">
-          <td>
-            {{ t.id }}
-            <i *ngIf="authLevel > 5" class="close icon" (click)="delete(t.id)"></i>
-          </td>
-          <td>{{ t.postedOn | date:'d/M hh:mm aa'}}</td>
-          <td>{{ t.description }}</td>
-          <td>{{ +t.giver_id === +selectedAccount ? t.receiver : t.giver }}
-          </td>
-          <td class="right aligned" [ngClass]="getClass(t)">{{ t.amount | number: '1.2-2' }}</td>
-          <td class="right aligned">{{ t.balance | number:'1.2-2' }}</td>
-        </tr>
-      </tbody>
-      <tfoot>
-        <td>Time</td>
-        <td>Description</td>
-        <td>Transfer</td>
-        <td>Amount</td>
-        <td>Balance</td>
-      </tfoot>
-    </table>
+  <div class="twelve wide column">
+    <div class="scrollable">
+      <h2 class="ui center aligned header" [hidden]="transactions.length > 0">No Transactions Details</h2>
+      <table class="ui selectable mini compant celled table" [hidden]="transactions.length === 0">
+        <thead>
+          <tr>
+            <th>#</th>
+            <th>Time</th>
+            <th>Description</th>
+            <th>Transfer</th>
+            <th>Amount</th>
+            <th>Balance</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr *ngFor="let t of transactions" [ngClass]="getClass(t)">
+            <td>
+              {{ t.id }}
+              <i *ngIf="authLevel > 5" class="close icon" (click)="delete(t.id)"></i>
+            </td>
+            <td>{{ t.postedOn | date:'d/M hh:mm aa'}}</td>
+            <td>{{ t.description }}</td>
+            <td>{{ +t.giver_id === +selectedAccount ? t.receiver : t.giver }}
+            </td>
+            <td class="right aligned">
+              <i class="check icon" *ngIf="t.match"></i>
+              {{ t.amount | number: '1.2-2' }}
+            </td>
+            <td class="right aligned">{{ t.balance | number:'1.2-2' }}</td>
+          </tr>
+        </tbody>
+        <tfoot>
+          <tr>
+            <th>#</th>
+            <th>Time</th>
+            <th>Description</th>
+            <th>Transfer</th>
+            <th>Amount</th>
+            <th>Balance</th>
+          </tr>
+        </tfoot>
+      </table>
+    </div>
+    <hr>
+    <div class="ui label" *ngFor="let n of trackedAmounts">{{ n }}</div>
   </div>
 </div>

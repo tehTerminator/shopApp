@@ -1,8 +1,8 @@
 import { DirectoryService } from './../../service/directory.service';
+import { UserService } from './../../service/user.service';
 import { MySQLService } from './../../service/my-sql.service';
 import { Component, OnInit } from '@angular/core';
 import { CashTransaction } from '../../interface/cash-transaction';
-import { Directory } from '../../interface/directory';
 import { DatePipe } from '@angular/common';
 
 @Component({
@@ -13,15 +13,19 @@ import { DatePipe } from '@angular/common';
 })
 export class AccountDetailsComponent implements OnInit {
   transactions: Array<CashTransaction> = [];
-  selectedAccount: Directory;
+  selectedAccount: number;
   fromDate = '';
   toDate = '';
   singleDay = true;
+  authLevel = this.us.currentUser.authLevel;
+  trackedAmounts: Array<number> = [];
+  checkCommand: string;
 
   constructor(
     private mysql: MySQLService,
     public directory: DirectoryService,
-    private datePipe: DatePipe
+    private datePipe: DatePipe,
+    private us: UserService
   ) { }
 
   ngOnInit() {
@@ -99,19 +103,23 @@ export class AccountDetailsComponent implements OnInit {
     };
 
     if (this.singleDay) {
+      const fromDate = this.datePipe.transform( this.strToDate(this.fromDate), 'yyyy-MM-dd');
       request.andWhere.andWhere = {
-        'DATE(postedOn)': this.fromDate
+        'DATE(postedOn)': ['BETWEEN', fromDate, fromDate],
+        state: ['<>', 'REJECTED']
       };
     } else {
-      if (this.fromDate < this.toDate) {
-        request.andWhere.andWhere = {
-          'DATE(postedOn)': ['BETWEEN', this.fromDate, this.toDate]
-        };
-      } else {
+      if (this.fromDate > this.toDate) {
         alert('From Date should be smaller than to toDate');
         return;
+      } else {
+        const fromDate = this.datePipe.transform( this.strToDate(this.fromDate), 'yyyy-MM-dd');
+        const toDate = this.datePipe.transform( this.strToDate(this.toDate), 'yyyy-MM-dd');
+        request.andWhere.andWhere = {
+          'DATE(postedOn)': ['BETWEEN', fromDate, toDate],
+          state: ['<>', 'REJECTED']
+        };
       }
-      request.andWhere.andWhere['state'] = ['<>', 'REJECTED'];
     }
 
     this.mysql.select('cashbook', request).subscribe((res: Array<CashTransaction>) => {
@@ -119,6 +127,7 @@ export class AccountDetailsComponent implements OnInit {
         item.giver = this.directory.get(+item.giver_id).name;
         item.receiver = this.directory.get(+item.receiver_id).name;
         item.balance = 0;
+        item.amount = +item.amount;
         this.transactions.push(item);
         const currentElement = this.transactions.length - 1;
         const prevElement = this.transactions.length - 2;
@@ -133,14 +142,55 @@ export class AccountDetailsComponent implements OnInit {
     });
   }
 
-  private strToDate(theDate: string): Date{
-    if( theDate.length !== 8 ){
+  delete(transactionId: number): void {
+    if ( confirm('Do You Really Want To Delete Transaction #' + transactionId) ) {
+      this.mysql.delete('cashbook', {
+        andWhere: {
+          id: transactionId
+        }
+      }).subscribe(() => {
+        const i = this.transactions.findIndex(x => +x.id === +transactionId);
+        this.transactions.splice(i, 1);
+      });
+
+      this.mysql.delete('taskcashbook', {
+        andWhere: {
+          cashbook_id: transactionId
+        }
+      });
+    }
+  }
+
+  private strToDate(theDate: string): Date {
+    if ( theDate.length !== 8 ) {
       return new Date();
     } else {
       const year = +theDate.substr(0, 4);
       const month = +theDate.substr(4, 2);
       const day = +theDate.substr(6, 2);
-      return new Date(year, month, day);
+      return new Date(year, month - 1, day);
     }
+  }
+
+  check(): void {
+    let amount = 0;
+    let count = 1;
+    if ( this.checkCommand.indexOf('x') > 0 ) {
+      const parts = this.checkCommand.split('x');
+      amount = +parts[0];
+      count = +parts[1];
+    } else {
+        amount = +this.checkCommand;
+    }
+    let i = 0;
+    for ( i = 0; i < count; i++) {
+      const t = this.transactions.find(x => (x.amount === amount && !x.match) );
+      if ( t !== undefined ) {
+        t.match = true;
+      } else {
+        this.trackedAmounts.push(amount);
+      }
+    }
+
   }
 }
