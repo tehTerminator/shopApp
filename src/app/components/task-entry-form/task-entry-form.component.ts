@@ -46,7 +46,7 @@ export class TaskEntryFormComponent implements OnInit {
       this.batch = allBatch.filter((x: Batch) => (x.isPrimarily('task') && x.isFixed()) );
     });
   }
-  
+
   onSearchChange(searchValue: string) {
     const word = this.task.customerName.split(' ').pop() + '%';
     if (word.length >= 3) {
@@ -85,7 +85,7 @@ export class TaskEntryFormComponent implements OnInit {
         }
       }, true).subscribe((res: any)=>{
         console.log(res.query);
-      })
+      });
     });
 
     // Update Description of Cashbook Entries
@@ -98,7 +98,6 @@ export class TaskEntryFormComponent implements OnInit {
     this.bs.set(this.task, this.cashTransactions, this.productTransactions);
     this.bs.save();
     this.reset();
-
   }
 
   extractDetails() {
