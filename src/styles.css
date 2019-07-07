@@ -17,6 +17,10 @@
     text-decoration: underline;
 }
 
+.ui.label{
+    margin-bottom: 5px!important;
+}
+
 
 /* Mobile first queries */
 
