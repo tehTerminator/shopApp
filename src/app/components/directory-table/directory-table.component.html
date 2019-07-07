@@ -20,7 +20,7 @@
     <th>Type</th>
   </thead>
   <tbody>
-    <tr *ngFor="let item of directory | search:'id,name,type':searchText | slice:0:5">
+    <tr *ngFor="let item of directory.getAll() | search:'id,name,type':searchText | slice:0:5">
       <td>{{ item.id }}</td>
       <td>{{ item.name }}</td>
       <td>{{ item.type | titlecase }}</td>

@@ -1,0 +1,48 @@
+<div class="ui two column grid">
+  <div class="five wide column">
+    <div class="ui form segment">
+      <div class="field">
+        <label for="date">Date</label>
+        <input type="date" name="date" [(ngModel)]="theDate">
+      </div>
+      <div class="field">
+        <label for="accountId">Account</label>
+        <select name="" [(ngModel)]="selectedAccount" (change)="get()">
+          <option value='0' selected="selected">Select Account</option>
+          <option *ngFor="let account of directory.getAccounts()" [value]="account.id">{{ account.name }}</option>
+        </select>
+      </div>
+      <hr>
+      <button class="ui fluid button" (click)="get()">Show</button>
+    </div>
+  </div>
+  <div class="eleven wide column">
+    <h2 class="ui center aligned header" [hidden]="transactions.length > 0">No Transactions Details</h2>
+    <table class="ui compant celled table" [hidden]="transactions.length === 0">
+      <thead>
+        <th>Time</th>
+        <th>Description</th>
+        <th>Transfer</th>
+        <th>Amount</th>
+        <th>Balance</th>
+      </thead>
+      <tbody>
+        <tr *ngFor="let t of transactions">
+          <td>{{ t.postedOn | date:'shortTime'}}</td>
+          <td>{{ t.description }}</td>
+          <td>{{ t.giver_id == selectedAccount ? t.receiver : t.giver }}
+          </td>
+          <td class="right aligned" [ngClass]="getClass(t)">{{ t.amount | number: '1.2-2' }}</td>
+          <td class="right aligned">{{ t.balance | number:'1.2-2' }}</td>
+        </tr>
+      </tbody>
+      <tfoot>
+        <td>Time</td>
+        <td>Description</td>
+        <td>Transfer</td>
+        <td>Amount</td>
+        <td>Balance</td>
+      </tfoot>
+    </table>
+  </div>
+</div>

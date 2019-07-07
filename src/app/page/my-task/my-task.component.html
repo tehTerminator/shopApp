@@ -1,0 +1,38 @@
+<div class="ui two column grid">
+  <div class="five wide column">
+    <div class="ui fluid top attached vertical menu">
+      <div class="item">
+        <div class="ui transparent icon input">
+          <input type="date" [(ngModel)]="theDate" (change)="getUnassigned()">
+          <i class="calendar icon"></i>
+        </div>
+      </div>
+      <div class="item">
+        <div class="ui transparent icon input">
+          <input type="text" name="searchText" [(ngModel)]="searchTest" placeholder="Search Text">
+          <i class="search icon"></i>
+        </div>
+      </div>
+    </div>
+    <div class="ui buttom attached scrollable segment">
+      <div class="ui divided list">
+        <a class="item" (click)="assignTask(task)" *ngFor="let task of unassigned|search:'id,customerName':searchText">
+            <div class="right floated content">
+                <div class="ui label">
+                    {{ task.id }}
+                </div>
+            </div>
+            <div class="content">
+                <div class="header">{{ task.customerName }}</div>
+                <div class="description">
+                    {{ task.insertedAt | date:'shortTime' }}
+                </div>
+            </div>
+        </a>
+    </div>
+    </div>
+  </div>
+  <div class="twelve wide column">
+    
+  </div>
+</div>

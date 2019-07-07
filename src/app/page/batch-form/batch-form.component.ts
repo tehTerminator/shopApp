@@ -12,7 +12,7 @@ export class BatchFormComponent implements OnInit {
 
   theBatch: Batch;
   selectedSetting = 'product';
-  settingsForm: {};
+  settingsForm = {};
   constructor(private mysql: MySQLService, private notificationService: NotificationService) { }
 
   ngOnInit() {
@@ -46,7 +46,12 @@ export class BatchFormComponent implements OnInit {
       userData: this.theBatch.toMySqlFormat()
     };
     this.mysql.insert('batch', request, true).subscribe((res: any) => {
-      console.log(res);
+      this.notificationService.changeMessage({
+        id: res.lastInsertId,
+        text: `Created new Batch ${this.theBatch.title} of type - ${this.theBatch.getType()}`,
+        status: 'green'
+      });
+      this.reset();
     });
   }
 
@@ -57,5 +62,11 @@ export class BatchFormComponent implements OnInit {
 
   isEmpty() {
     return this.theBatch.title === '';
+  }
+
+  reset() {
+    this.theBatch = new Batch(0, '', 0, []);
+    this.settingsForm = {};
+    this.showSettingsForm(this.selectedSetting);
   }
 }

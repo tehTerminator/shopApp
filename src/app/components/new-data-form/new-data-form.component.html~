@@ -1,0 +1,245 @@
+<div class="ui three fluid buttons">
+  <button class="ui labeled icon button" (click)="prevTab()" [disabled]="tab === 0">
+    <i class="ui left arrow icon"></i>
+    Back
+  </button>
+  <button class="ui icon button" (click)="tab=0" [disabled]="tab===0">
+	  <i class="home icon"></i>
+  </button>
+  <button class="ui right labeled icon button" [disabled]="tab===4" (click)="nextTab()">
+    <i class="ui right arrow icon"></i>
+    Forward
+  </button>
+</div>
+
+<div class="ui form segment" [hidden]="!(tab===0)">
+  <div class="ui fluid icon input">
+    <i class="search icon"></i>
+    <input type="text" placeholder="Search..." name="searchServiceText" [(ngModel)]="searchServiceText">
+  </div>
+  <div class="ui divided relaxed selection list">
+    <div class="item" *ngFor="let b of batch|search:'rate,title':searchServiceText|slice:0:5" (click)="selectBatch(b)">
+      <div class="right floated content">
+        Rs. {{ b.rate }}
+      </div>
+      {{ b.title }}
+    </div>
+  </div>
+</div>
+
+<div class="ui form segment" [hidden]="!(tab === 1)">
+  <!--Task Segment -->
+  <div [hidden]="selectedBatch.doesItCreatesTask()" class="ui segment">
+    <h2>Does not Creates Task</h2>
+    <button class="ui fluid button" (click)="prevTab()">
+      Go Back
+    </button>
+  </div>
+  <div [hidden]="!selectedBatch.doesItCreatesTask()">
+    <div class="field">
+      <label for="customerName">Customer Name</label>
+      <input type="text" [(ngModel)]="task.customerName">
+    </div>
+    <div class="field">
+      <label for="amountCollected">Amount Collected</label>
+      <input type="number" min="0" step="0.01" name="amountCollected" [(ngModel)]="task.amountCollected">
+    </div>
+    <div class="field">
+      <label for="paymentStatus">Status</label>
+      <select name="status" [(ngModel)]="task.status">
+        <option value="INACTIVE" selected="selected">INACTIVE</option>
+        <option value="UNPAID">UNPAID</option>
+        <option value="COMPLETED">COMPLETED</option>
+      </select>
+    </div>
+    <div class="ui fluid blue button" (click)="showPreview()" [hidden]="task.customerName.length < 3">Preview</div>
+  </div>
+</div>
+
+<div [hidden]="!(tab===2)">
+  <!-- CashBook Segment -->
+  <div [hidden]="selectedBatch.doesItCreatesCashbookEntry()" class="ui segment">
+    <h2>No Cash Transactions</h2>
+    <button class="ui fluid button" (click)="prevTab()">
+      Go Back
+    </button>
+  </div>
+  <div class="ui form segment" *ngFor="let ct of cashTransactions"
+    [hidden]="!selectedBatch.doesItCreatesCashbookEntry()">
+    <div class="two mini fields">
+      <div class="field">
+        <label for="">Giver</label>
+        <select name="giver_id" [(ngModel)]="ct.giver_id">
+          <option>--Select Account--</option>
+          <option *ngFor="let ac of directoryService.getAccounts()" value="{{ ac.id }}">{{ ac.name }}</option>
+        </select>
+      </div>
+      <div class="field">
+        <label for="receiver_id">Receiver</label>
+        <select name="receiver_id" [(ngModel)]="ct.receiver_id">
+          <option>--Select Account--</option>
+          <option *ngFor="let ac of directoryService.getAccounts()" value="{{ ac.id }}">{{ ac.name }}</option>
+        </select>
+      </div>
+    </div>
+    <div class="two fields">
+      <div class="six wide field">
+        <label for="amount">Amount</label><input min="0" step="0.01" type="number" name="amount"
+          [(ngModel)]="ct.amount">
+      </div>
+      <div class="ten wide field">
+        <label for="description">Desc.</label>
+        <input type="text" name="description" [(ngModel)]="ct.description">
+      </div>
+    </div>
+    <hr>
+  </div>
+  <button class="ui fluid button" (click)="showPreview()">
+    Preview
+  </button>
+</div>
+
+<div [hidden]="!(tab===3)">
+  <!-- Product Segment -->
+  <div [hidden]="selectedBatch.doesItUsesProducts()" class="ui segment">
+    <h2>No Product Transactions Available</h2>
+    <button class="ui fluid button" (click)="prevTab()">
+      Previous Page
+    </button>
+  </div>
+  <div class="ui form segment" *ngFor="let p of productTransactions" [hidden]="!selectedBatch.doesItUsesProducts()">
+    <div class="field">
+      <label for="product_id">Product</label>
+      <select name="product_id" [(ngModel)]="p.product_id">
+        <option>--Select Product--</option>
+        <option *ngFor="let product of directoryService.getProducts()" value="{{product.id}}">{{ product.name }}
+        </option>
+      </select>
+    </div>
+    <div class="two fields">
+      <div class="field">
+        <label for="quantity">Quantity</label>
+        <input type="number" name="quantity" [(ngModel)]="p.quantity">
+      </div>
+      <div class="field">
+        <label for="amount">Amount</label>
+        <input type="number" name="amount" [(ngModel)]="p.amount">
+      </div>
+    </div>
+  </div>
+  <hr>
+  <button class="ui fluid blue button" (click)="showPreview()">
+    Preview
+  </button>
+</div>
+
+<div class="ui segment" [hidden]="!(tab===4)">
+  <!-- Task Preview -->
+  <div [hidden]="selectedBatch.doesItCreatesTask()">
+    <h2>Selected Batch Does Not Create Task.</h2>
+    <button class="ui fluid button" (click)="prevTab()">
+      Goto ProductPage
+    </button>
+  </div>
+  <div [hidden]="!selectedBatch.doesItCreatesTask()">
+    <h4>{{ task.customerName }}</h4>
+    <h4>{{ selectedBatch.title }}</h4>
+    <table class="ui compact celled table" [hidden]="!selectedBatch.doesItCreatesCashbookEntry()">
+      <thead>
+        <tr>
+          <th>Desc.</th>
+          <th>Amt</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr *ngFor="let ct of cashTransactions">
+          <td>
+            {{ ct.giver }} to {{ ct.receiver }}
+          </td>
+          <td>
+            {{ ct.amount }}
+          </td>
+        </tr>
+      </tbody>
+      <tfoot>
+        <tr>
+          <td>
+            Total
+          </td>
+          <td>
+            {{ getCashBookTotal() }}
+          </td>
+        </tr>
+        <tr>
+          <td>
+            Customer Paid
+          </td>
+          <td>
+            {{ task.amountCollected }}
+          </td>
+        </tr>
+        <tr [hidden]="getCashBookTotal() === task.amountCollected">
+          <td>
+            Imbalance
+          </td>
+          <td>
+            {{ task.amountCollected - getCashBookTotal() }}
+          </td>
+        </tr>
+      </tfoot>
+    </table>
+    <hr>
+    <button class="ui fluid green button" (click)="save()" [hidden]="!this.selectedBatch.doesItCreatesTask()">
+      Save Task
+    </button>
+  </div>
+</div>
+
+<div [hidden]="!(tab === 5)">
+  <!-- Product Preview -->
+  <div class="ui segment">
+    <div class="ui list">
+      <div class="item" *ngFor="let p of productTransactions">{{ p.productName }} - Qty( {{ p.quantity }} ) for
+        Rs.{{ p.amount }} </div>
+    </div>
+    <hr>
+    <button class="ui fluid green button" (click)="save()">Save</button>
+  </div>
+</div>
+
+<div [hidden]="!(tab===6)">
+  <div class="ui segment">
+    <table class="ui compact celled table" [hidden]="!selectedBatch.doesItCreatesCashbookEntry()">
+      <thead>
+        <tr>
+          <th>Desc.</th>
+          <th>Amt</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr *ngFor="let ct of cashTransactions">
+          <td>
+            {{ ct.giver }} to {{ ct.receiver }}
+          </td>
+          <td>
+            {{ ct.amount }}
+          </td>
+        </tr>
+      </tbody>
+      <tfoot>
+        <tr>
+          <td>
+            Total
+          </td>
+          <td>
+            {{ getCashBookTotal() }}
+          </td>
+        </tr>
+      </tfoot>
+    </table>
+    <hr>
+    <button class="ui fluid green button" (click)="save()">
+      Submit
+    </button>
+  </div>
+</div>

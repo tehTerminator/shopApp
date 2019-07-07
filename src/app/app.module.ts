@@ -31,6 +31,11 @@ import { AccountDetailsComponent } from './page/account-details/account-details.
 import { NotificationService } from './service/notification.service';
 import { AccountBalanceComponent } from './page/account-balance/account-balance.component';
 import { AssignTaskComponent } from './components/assign-task/assign-task.component';
+import { DayReportComponent } from './page/day-report/day-report.component';
+import { AccountCardComponent } from './components/account-card/account-card.component';
+import { ReportComponent } from './page/report/report.component';
+import { AbsPipe } from './pipes/abs.pipe';
+import { MyTaskComponent } from './page/my-task/my-task.component';
 
 @NgModule({
   declarations: [
@@ -58,7 +63,12 @@ import { AssignTaskComponent } from './components/assign-task/assign-task.compon
     TaskLabelComponent,
     AccountDetailsComponent,
     AccountBalanceComponent,
-    AssignTaskComponent
+    AssignTaskComponent,
+    DayReportComponent,
+    AccountCardComponent,
+    ReportComponent,
+    AbsPipe,
+    MyTaskComponent
   ],
   imports: [
     BrowserModule,

@@ -2,15 +2,15 @@
   <div class="two divided fields">
     <div class="field">
       <label for="customerPaid">Customer Paid</label>
-      <div class="ui icon input">
+      <div class="ui icon mini input">
         <i class="rupee icon"></i>
         <input type="number" [(ngModel)]="customerPaid">
       </div>
     </div>
     <div class="field">
       <label for="billAmount">Bill Amount</label>
-      <div class="ui icon input">
-        <i class="rupee icon"></i>
+      <div class="ui labeled mini input">
+        <div class="ui label">-</div>
         <input type="number" name="billAmount" [(ngModel)]="billAmount" (change)="calculateReturnAmount()">
       </div>
     </div>
@@ -18,14 +18,14 @@
   <hr>
   <div class="field">
     <label for="returnAmount">Return Amount</label>
-    <div class="ui icon input">
+    <div class="ui icon big red input">
       <i class="rupee icon"></i>
       <input type="number" name="returnAmount" [(ngModel)]="returnAmount" disabled="true">
     </div>
   </div>
   <div class="ui mini list">
-    <li class="item" *ngFor="let note of objectKey(ww)">
-      <div class="ui labeled fluid input">
+    <li class="item" *ngFor="let note of objectKey()">
+      <div class="ui labeled fluid small input">
         <input type="number" [(ngModel)]="notes[note]" (change)="calculate()">
         <div class="ui right tag label">
           <i class="rupee icon"></i>{{ note }}

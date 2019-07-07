@@ -1,0 +1,66 @@
+import { Component, OnInit, Input } from '@angular/core';
+import { MySQLService } from './../../service/my-sql.service';
+
+@Component({
+    selector: 'app-account-card',
+    templateUrl: './account-card.component.html',
+    styleUrls: ['./account-card.component.css']
+})
+export class AccountCardComponent implements OnInit {
+    @Input theName: string;
+    @Input theDate: Date;
+    accountId: number;
+    total: {
+        given: 0,
+            received: 0,
+            result: 0
+    };
+
+    constructor(private db: MySQLService) {  }
+
+    ngOnInit() {
+        getAccountId();
+    }
+
+    private getAccountId(): void{
+        const request = {
+            andWhere : {
+                name : this.theName,
+                type: 'account'
+            }
+        };
+        this.db.select('directory', request).subscribe((res: any)=>{
+            if( res.length >= 1 ){
+                this.accountId = +res[0].id;
+                this.getAmount();
+            } else {
+                this.accountId = 0;
+            }
+        });
+    }
+
+    private getAmount(): void{
+        const request = {
+            andWhere: {
+                andWhere: {
+                    postedOn: theDate
+                },
+                orWhere: {
+                    getAccountId(;
+                        giver_id: this.accountId,
+                        receiver_id: this.accountId
+                    }
+            }
+        };
+        this.db.select('cashbook', request).subscribe((res: any)=>{
+            Array.from(res).forEach((item: CashTransaction)=>{
+                if( +item.giver_id = this.accountId ){
+                    this.total.given += +item.amount;
+                } else {
+                    this.total.received += +item.amount;
+                }
+            });
+            this.total.result = Math.abs(this.total.received - this.total.given);
+        });
+    }
+}

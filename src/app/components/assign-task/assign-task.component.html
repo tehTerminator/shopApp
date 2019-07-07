@@ -1,12 +1,15 @@
-<div class="ui form segment">
+<div class="ui top attached header">
+  Assign Task
+</div>
+<div class="ui bottom attached form segment">
   <div class="ui fluid action input">
     <input type="number" name="id" min="0" step="1" (change)="get()" [(ngModel)]="taskId">
     <button class="ui icon button" (click)="get()">
       <i class="search icon"></i>
     </button>
   </div>
-  <hr>
-  <div class="ui list" [hidden]="task === undefined || task.id === 0">
+  <div class="ui list" [hidden]="taskId === 0">
+    <hr>
     <div class="item">
       Customer Name : <strong>{{ task.customerName }}</strong>
     </div>
@@ -19,6 +22,9 @@
     <div class="item">
       Status : <strong> {{ task.status }}</strong>
     </div>
+    <div class="item" [hidden]="task.comment === null || task.comment.length === 0">
+      Description: <strong>{{ task.comment }}</strong>
+    </div>
   </div>
   <hr>
   <div class="field">
@@ -29,5 +35,5 @@
     </select>
   </div>
 
-  <button class="ui fluid button" (click)="set()">Assign</button>
+  <button class="ui fluid button" [hidden]="taskId===0" (click)="set()">Assign</button>
 </div>

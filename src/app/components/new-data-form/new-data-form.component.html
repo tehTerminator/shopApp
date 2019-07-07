@@ -1,7 +1,10 @@
-<div class="ui two fluid buttons">
+<div class="ui three fluid buttons">
   <button class="ui labeled icon button" (click)="prevTab()" [disabled]="tab === 0">
     <i class="ui left arrow icon"></i>
     Back
+  </button>
+  <button class="ui icon button" (click)="tab=0" [disabled]="tab===0">
+	  <i class="home icon"></i>
   </button>
   <button class="ui right labeled icon button" [disabled]="tab===4" (click)="nextTab()">
     <i class="ui right arrow icon"></i>
@@ -12,7 +15,7 @@
 <div class="ui form segment" [hidden]="!(tab===0)">
   <div class="ui fluid icon input">
     <i class="search icon"></i>
-    <input type="text" name="searchServiceText" [(ngModel)]="searchServiceText">
+    <input type="text" placeholder="Search..." name="searchServiceText" [(ngModel)]="searchServiceText">
   </div>
   <div class="ui divided relaxed selection list">
     <div class="item" *ngFor="let b of batch|search:'rate,title':searchServiceText|slice:0:5" (click)="selectBatch(b)">
@@ -25,6 +28,7 @@
 </div>
 
 <div class="ui form segment" [hidden]="!(tab === 1)">
+  <!--Task Segment -->
   <div [hidden]="selectedBatch.doesItCreatesTask()" class="ui segment">
     <h2>Does not Creates Task</h2>
     <button class="ui fluid button" (click)="prevTab()">
@@ -48,11 +52,12 @@
         <option value="COMPLETED">COMPLETED</option>
       </select>
     </div>
-    <div class="ui fluid blue button" (click)="showPreview()">Preview</div>
+    <div class="ui fluid blue button" (click)="showPreview()" [hidden]="task.customerName.length<3">Preview</div>
   </div>
 </div>
 
 <div [hidden]="!(tab===2)">
+  <!-- CashBook Segment -->
   <div [hidden]="selectedBatch.doesItCreatesCashbookEntry()" class="ui segment">
     <h2>No Cash Transactions</h2>
     <button class="ui fluid button" (click)="prevTab()">
@@ -78,19 +83,24 @@
       </div>
     </div>
     <div class="two fields">
-      <div class="field">
+      <div class="six wide field">
         <label for="amount">Amount</label><input min="0" step="0.01" type="number" name="amount"
           [(ngModel)]="ct.amount">
       </div>
-      <div class="field">
+      <div class="ten wide field">
         <label for="description">Desc.</label>
         <input type="text" name="description" [(ngModel)]="ct.description">
       </div>
     </div>
+    <hr>
   </div>
+  <button class="ui fluid button" (click)="showPreview()">
+    Preview
+  </button>
 </div>
 
 <div [hidden]="!(tab===3)">
+  <!-- Product Segment -->
   <div [hidden]="selectedBatch.doesItUsesProducts()" class="ui segment">
     <h2>No Product Transactions Available</h2>
     <button class="ui fluid button" (click)="prevTab()">
@@ -116,13 +126,15 @@
         <input type="number" name="amount" [(ngModel)]="p.amount">
       </div>
     </div>
-    <button class="ui fluid blue button" (click)="showPreview()">
-      Preview
-    </button>
   </div>
+  <hr>
+  <button class="ui fluid blue button" (click)="showPreview()">
+    Preview
+  </button>
 </div>
 
 <div class="ui segment" [hidden]="!(tab===4)">
+  <!-- Task Preview -->
   <div [hidden]="selectedBatch.doesItCreatesTask()">
     <h2>Selected Batch Does Not Create Task.</h2>
     <button class="ui fluid button" (click)="prevTab()">
@@ -184,6 +196,7 @@
 </div>
 
 <div [hidden]="!(tab === 5)">
+  <!-- Product Preview -->
   <div class="ui segment">
     <div class="ui list">
       <div class="item" *ngFor="let p of productTransactions">{{ p.productName }} - Qty( {{ p.quantity }} ) for
@@ -191,5 +204,42 @@
     </div>
     <hr>
     <button class="ui fluid green button" (click)="save()">Save</button>
+  </div>
+</div>
+
+<div [hidden]="!(tab===6)">
+  <div class="ui segment">
+    <table class="ui compact celled table" [hidden]="!selectedBatch.doesItCreatesCashbookEntry()">
+      <thead>
+        <tr>
+          <th>Desc.</th>
+          <th>Amt</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr *ngFor="let ct of cashTransactions">
+          <td>
+            {{ ct.giver }} to {{ ct.receiver }}
+          </td>
+          <td>
+            {{ ct.amount }}
+          </td>
+        </tr>
+      </tbody>
+      <tfoot>
+        <tr>
+          <td>
+            Total
+          </td>
+          <td>
+            {{ getCashBookTotal() }}
+          </td>
+        </tr>
+      </tfoot>
+    </table>
+    <hr>
+    <button class="ui fluid green button" (click)="save()">
+      Submit
+    </button>
   </div>
 </div>

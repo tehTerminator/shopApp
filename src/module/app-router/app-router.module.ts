@@ -10,8 +10,11 @@ import { AdminComponent } from './../../app/page/admin/admin.component';
 import { DirectoryComponent } from './../../app/page/directory/directory.component';
 import { LoginComponent } from './../../app/page/login/login.component';
 import { HomeComponent } from './../../app/page/home/home.component';
+import { DayReportComponent } from './../../app/page/day-report/day-report.component';
+import { ReportComponent } from './../../app/page/report/report.component';
 import { NgModule } from '@angular/core';
 import { RouterModule, Routes } from '@angular/router';
+import { MyTaskComponent } from '../../app/page/my-task/my-task.component';
 
 const routes: Routes = [
   {
@@ -51,7 +54,17 @@ const routes: Routes = [
     path: 'batch/create', component: BatchFormComponent
   }, {
     path: 'cashbook/balance', component: AccountBalanceComponent
+  },
+  {
+    path: 'report/day', component: DayReportComponent
+  },
+  {
+    path: 'report', component: ReportComponent
+  },
+  {
+    path: 'task/myTask', component: MyTaskComponent
   }
+
 ];
 
 @NgModule({

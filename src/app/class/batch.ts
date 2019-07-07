@@ -1,9 +1,9 @@
 export class Batch {
 
-    constructor(theId: number, theTitle: string, theRate: any, someSettings: any) {
-        this.id = theId;
+    constructor(theId: any, theTitle: string, theRate: any, someSettings: any) {
+        this.id = +theId;
         this.title = theTitle;
-        this.rate = Number.parseFloat(theRate);
+        this.rate = +theRate;
         if (typeof (someSettings) === 'string' || someSettings instanceof String) {
             this.settings = JSON.parse(someSettings.toString());
         } else {
@@ -85,5 +85,21 @@ export class Batch {
             total += +c.amount;
         });
         return total;
+    }
+
+    getType(): string {
+        if (this.doesItCreatesTask()) {
+            return 'task';
+        } else if (this.doesItUsesProducts()) {
+            return 'product';
+        } else if (this.doesItCreatesCashbookEntry()) {
+            return 'cashbook';
+        } else {
+            return 'Empty Batch';
+        }
+    }
+
+    isPrimarily(theType: string): boolean {
+        return this.getType() === theType;
     }
 }

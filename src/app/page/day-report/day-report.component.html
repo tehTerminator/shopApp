@@ -1,0 +1,34 @@
+<div class="ui menu">
+		<div class="ui header item">Day Report</div>
+		<div class="item">
+				<div class="ui input">
+						<input type="date" [(ngModel)]="theDate">
+				</div>
+		</div>
+</div>
+
+<div class="ui segment">
+	<div class="ui doubling cards">
+		<div class="ui card">
+			<app-account-card theName="sales" [theDate]="theDate"></app-account-card>
+		</div>
+		<div class="ui card">
+			<app-account-card theName="commission" [theDate]="theDate"></app-account-card>
+		</div>
+		<div class="ui card">
+			<app-account-card theName="expense" [theDate]="theDate"></app-account-card>
+		</div>
+		<div class="ui card">
+			<app-account-card theName="shop" [theDate]="theDate" showMeta="true"></app-account-card>
+		</div>
+		<div class="ui card">
+			<app-account-card theName="mponline" [theDate]="theDate" showMeta="true"></app-account-card>
+		</div>
+		<div class="ui card">
+			<app-account-card theName="csc" [theDate]="theDate" showMeta="true"></app-account-card>
+		</div>
+		<div class="ui card">
+			<app-account-card theName="sbi maharaja" [theDate]="theDate" showMeta="true"></app-account-card>
+		</div>
+	</div>
+</div>

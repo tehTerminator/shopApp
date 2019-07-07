@@ -1,7 +1,12 @@
-import { BatchJob } from './BatchJob';
+import { Batch } from './Batch';
 
-describe('BatchJob', () => {
+describe('Batch', () => {
   it('should create an instance', () => {
-    expect(new BatchJob()).toBeTruthy();
+    expect(new Batch(0, '', 0, {})).toBeTruthy();
+  });
+
+  it('should return true', () => {
+    const batch = new Batch(0, '', 0, { product_id: 1 });
+    expect(batch.isPrimarily('product')).toBeTruthy();
   });
 });

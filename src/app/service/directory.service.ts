@@ -3,69 +3,81 @@ import { Injectable } from '@angular/core';
 import { Directory } from '../interface/directory';
 
 @Injectable({
-  providedIn: 'root'
+		providedIn: 'root'
 })
 export class DirectoryService {
-  private data: Array<Directory> = [];
+		private data: Array<Directory> = [];
 
-  constructor(private mysql: MySQLService) {
-    this.mysql.select('directory').subscribe((res: any) => this.set(res));
-  }
+		constructor(private mysql: MySQLService) {
+			this.set();
+		}
 
-  reset(): void {
-    this.data = [];
-  }
+		reset(): void {
+				this.data = [];
+		}
 
-  set(theData: Array<any>): void {
-    this.reset();
-    theData.forEach((item: any) => {
-      this.data.push({ id: +item.id, name: item.name, type: item.type });
-    });
-  }
+		set(): void {
+				this.reset();
+				this.mysql.select('directory').subscribe((res: Array<Directory>) => {
+						Array.from(res).forEach((item: Directory) => {
+								this.data.push({ id: +item.id, name: item.name, type: item.type });
+						});
+				});
 
-  get(id: number): Directory {
-    return this.data.find(x => +x.id === +id);
-  }
+		}
 
-  find(theName: string): Directory {
-    const result = this.data.find(x => x.name.toLowerCase().indexOf(theName.toLowerCase()) >= 0);
-    if (result === undefined) {
-      return {
-        id: 0,
-        name: 'None',
-        type: 'account'
-      };
-    } else {
-      return result;
-    }
-  }
+		get(id: number): Directory {
+				return this.data.find(x => +x.id === +id);
+		}
 
-  /**
-   *
-   * @param theType string used to filter Directory based on its Type
-   */
-  private filterDirectory(theType: string): Array<Directory> {
-    return this.data.filter(x => x.type.indexOf(theType) >= 0);
-  }
+		/**
+		 * Finds the Directory using its name
+		 * @param theName name of the Directory
+		 */
+		find(theName: string): Directory {
+				theName = theName.toLowerCase();
+				const result = this.data.find(x => x.name.toLowerCase().indexOf(theName) >= 0);
+				if (result === undefined) {
+						return {
+								id: 0,
+								name: 'None',
+								type: 'account'
+						};
+				} else {
+						return result;
+				}
+		}
 
-  /**
-   * Filters Product From Directory
-   */
-  getProducts(): Array<Directory> {
-    return this.filterDirectory('product');
-  }
+		/**
+		 *
+		 * @param theType string used to filter Directory based on its Type
+		 */
+		private filterDirectory(theType: string): Array<Directory> {
+				return this.data.filter(x => x.type.indexOf(theType) >= 0);
+		}
 
-  /**
-   * Filters Account from Directory
-   */
-  getAccounts(): Array<Directory> {
-    return this.filterDirectory('account');
-  }
+		/**
+		 * Filters Product From Directory
+		 */
+		getProducts(): Array<Directory> {
+				return this.filterDirectory('product');
+		}
 
-  /**
-   * Filters Category from Directory
-   */
-  getCategories(): Array<Directory> {
-    return this.filterDirectory('category');
-  }
+		/**
+		 * Filters Account from Directory
+		 */
+		getAccounts(): Array<Directory> {
+				return this.filterDirectory('account');
+		}
+
+		/**
+		 * Filters Category from Directory
+		 */
+		getCategories(): Array<Directory> {
+				return this.filterDirectory('category');
+		}
+
+		getAll(): Array<Directory>{
+				return this.data;
+		}
 }

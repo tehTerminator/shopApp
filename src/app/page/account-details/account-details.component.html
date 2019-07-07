@@ -15,26 +15,33 @@
       <hr>
       <button class="ui fluid button" (click)="get()">Show</button>
     </div>
+    <hr>
+    <app-cash-book-form></app-cash-book-form>
   </div>
-  <div class="eleven wide column">
+  <div class="eleven wide scrollable column">
     <h2 class="ui center aligned header" [hidden]="transactions.length > 0">No Transactions Details</h2>
-    <table class="ui compant celled striped table" [hidden]="transactions.length === 0">
+    <table class="ui compant celled table" [hidden]="transactions.length === 0">
       <thead>
+        <th>#</th>
+        <th>Time</th>
         <th>Description</th>
         <th>Transfer</th>
         <th>Amount</th>
         <th>Balance</th>
       </thead>
       <tbody>
-        <tr *ngFor="let t of transactions" [class]="getClass(t)">
+        <tr *ngFor="let t of transactions">
+          <td>{{ t.id }}</td>
+          <td>{{ t.postedOn | date:'shortTime'}}</td>
           <td>{{ t.description }}</td>
-          <td>{{ t.giver_id === selectedAccount.id ? t.receiver : t.giver }} - {{ t.giver_id === selectedAccount.id }}
+          <td>{{ t.giver_id == selectedAccount ? t.receiver : t.giver }}
           </td>
-          <td>{{ t.amount }}</td>
-          <td>{{ t.balance }}</td>
+          <td class="right aligned" [ngClass]="getClass(t)">{{ t.amount | number: '1.2-2' }}</td>
+          <td class="right aligned">{{ t.balance | number:'1.2-2' }}</td>
         </tr>
       </tbody>
       <tfoot>
+        <td>Time</td>
         <td>Description</td>
         <td>Transfer</td>
         <td>Amount</td>
