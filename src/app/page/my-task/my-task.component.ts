@@ -38,7 +38,7 @@ export class MyTaskComponent implements OnInit, OnDestroy {
   }
 
   ngOnDestroy() {
-    if ( this.timerSubscription ) {
+    if (this.timerSubscription) {
       this.timerSubscription.unsubscribe();
     }
   }
@@ -163,10 +163,47 @@ export class MyTaskComponent implements OnInit, OnDestroy {
 
   setRejected(theTask: Task) {
     const index = this.assigned.indexOf(theTask);
+    this.refundMoney(theTask.id);
     this.setstate(theTask, 'REJECTED');
     theTask.state = 'REJECTED';
     this.assigned.splice(index, 1);
-    this.updateCashbook(theTask.id, theTask.state);
+  }
+
+  private refundMoney(taskId: number): void {
+    this.db.select('taskcashbook', {
+      columns: ['taskcashbook.cashbook_id as id',
+        'taskcashbook.task_id',
+        'cashbook.receiver_id',
+        'cashbook.giver_id',
+        'cashbook.amount',
+        'cashbook.description',
+      ],
+      andWhere: {
+        task_id: taskId
+      },
+      join: 'cashbook on cashbook.id = taskcashbook.cashbook_id'
+    }, true).subscribe((res: any) => {
+      console.log(res);
+      Array.from(res.rows).forEach((item: any) => {
+        const message = `Refund ${item.description}`;
+        this.db.insert('cashbook', {
+          userData: {
+            giver_id: item.receiver_id,
+            receiver_id: item.giver_id,
+            amount: item.amount,
+            description: `Refund ${item.description}`,
+            insertedBy: this.users.currentUser.id,
+            state: 'COMPLETED'
+          }
+        }, true).subscribe((res2: any) => {
+          this.notice.changeMessage({
+            id: res2.lastInsertId,
+            text: message,
+            state: 'green'
+          })
+        });
+      });
+    });
   }
 
   private updateCashbook(id: number, thestate: string): void {
@@ -219,22 +256,22 @@ export class MyTaskComponent implements OnInit, OnDestroy {
 
   getColor(theTask: Task): string {
     const state = theTask.state.toLowerCase();
-    if ( state === 'rejected' ) {
-        return 'inverted';
-    } else if ( state === 'unpaid' ) {
-        return 'teal';
-    } else if ( state === 'inactive' ) {
-        if ( theTask.acceptedBy > 0 ) {
-            return 'orange';
-        }
-    } else if ( state === 'active' ) {
-        return 'red';
-    } else if ( state === 'completed' ) {
-        return 'green';
-    } else if ( state === 'blue' ) {
-        return 'blue';
+    if (state === 'rejected') {
+      return 'inverted';
+    } else if (state === 'unpaid') {
+      return 'teal';
+    } else if (state === 'inactive') {
+      if (theTask.acceptedBy > 0) {
+        return 'orange';
+      }
+    } else if (state === 'active') {
+      return 'red';
+    } else if (state === 'completed') {
+      return 'green';
+    } else if (state === 'blue') {
+      return 'blue';
     } else {
-        return '';
+      return '';
     }
   }
 
