@@ -11,6 +11,7 @@ export interface Task {
     acceptedByUser?: User;
     completedAt?: any;
     amountCollected: number;
-    status: string;
+    state: string;
     comment?: string;
+    match?: boolean;
 }

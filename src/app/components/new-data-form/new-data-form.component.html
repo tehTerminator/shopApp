@@ -1,4 +1,4 @@
-<div class="ui three fluid buttons">
+<div class="ui three mini fluid buttons">
   <button class="ui labeled icon button" (click)="prevTab()" [disabled]="tab === 0">
     <i class="ui left arrow icon"></i>
     Back
@@ -36,7 +36,7 @@
     </button>
   </div>
   <div [hidden]="!selectedBatch.doesItCreatesTask()">
-    <div class="field">
+    <div class="required field">
       <label for="customerName">Customer Name</label>
       <input type="text" [(ngModel)]="task.customerName">
     </div>
@@ -45,12 +45,16 @@
       <input type="number" min="0" step="0.01" name="amountCollected" [(ngModel)]="task.amountCollected">
     </div>
     <div class="field">
-      <label for="paymentStatus">Status</label>
-      <select name="status" [(ngModel)]="task.status">
+      <label for="paymentstate">state</label>
+      <select name="state" [(ngModel)]="task.state">
         <option value="INACTIVE" selected="selected">INACTIVE</option>
         <option value="UNPAID">UNPAID</option>
         <option value="COMPLETED">COMPLETED</option>
       </select>
+    </div>
+    <div class="field">
+      <label for="comments">Comments</label>
+      <input type="text" name="comments" [(ngModel)]="task.comment">
     </div>
     <div class="ui fluid blue button" (click)="showPreview()" [hidden]="task.customerName.length<3">Preview</div>
   </div>
@@ -64,21 +68,20 @@
       Go Back
     </button>
   </div>
-  <div class="ui form segment" *ngFor="let ct of cashTransactions"
+  <div class="ui form segment" *ngFor="let ct of cashTransactions;let i = index;"
     [hidden]="!selectedBatch.doesItCreatesCashbookEntry()">
+    <hr>
     <div class="two mini fields">
       <div class="field">
         <label for="">Giver</label>
-        <select name="giver_id" [(ngModel)]="ct.giver_id">
-          <option>--Select Account--</option>
-          <option *ngFor="let ac of directoryService.getAccounts()" value="{{ ac.id }}">{{ ac.name }}</option>
+        <select name="giver_id" [(ngModel)]="ct.giver_id" (change)="updateGiver(ct.giver_id, i)">
+          <option *ngFor="let ac of directoryService.getAccounts()" [value]="ac.id">{{ ac.name }}</option>
         </select>
       </div>
       <div class="field">
         <label for="receiver_id">Receiver</label>
-        <select name="receiver_id" [(ngModel)]="ct.receiver_id">
-          <option>--Select Account--</option>
-          <option *ngFor="let ac of directoryService.getAccounts()" value="{{ ac.id }}">{{ ac.name }}</option>
+        <select name="receiver_id" [(ngModel)]="ct.receiver_id" (change)="updateReceiver(ct.receiver_id, i)">
+          <option *ngFor="let ac of directoryService.getAccounts()" [value]="ac.id">{{ ac.name }}</option>
         </select>
       </div>
     </div>
@@ -112,7 +115,7 @@
       <label for="product_id">Product</label>
       <select name="product_id" [(ngModel)]="p.product_id">
         <option>--Select Product--</option>
-        <option *ngFor="let product of directoryService.getProducts()" value="{{product.id}}">{{ product.name }}
+        <option *ngFor="let product of directoryService.getProducts()" [value]="product.id">{{ product.name }}
         </option>
       </select>
     </div>
@@ -189,7 +192,7 @@
       </tfoot>
     </table>
     <hr>
-    <button class="ui fluid green button" (click)="save()" [hidden]="!this.selectedBatch.doesItCreatesTask()">
+    <button class="ui fluid green button" (click)="save()" [hidden]="(task.customerName.length < 3)">
       Save Task
     </button>
   </div>
@@ -208,6 +211,7 @@
 </div>
 
 <div [hidden]="!(tab===6)">
+  <!-- Cash Transaction Preview -->
   <div class="ui segment">
     <table class="ui compact celled table" [hidden]="!selectedBatch.doesItCreatesCashbookEntry()">
       <thead>

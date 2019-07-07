@@ -55,6 +55,16 @@ export class NewDataFormComponent implements OnInit {
         }
     }
 
+    updateGiver(giverId: number, index: number): void {
+        this.cashTransactions[index].giver_id = giverId;
+        this.cashTransactions[index].giver = this.directoryService.get(giverId).name;
+    }
+
+    updateReceiver(receiverId: number, index: number): void {
+        this.cashTransactions[index].receiver_id = receiverId;
+        this.cashTransactions[index].receiver = this.directoryService.get(receiverId).name;
+    }
+
     private extractDetails(): void {
         let entries = this.selectedBatch.getProductSettings();
         this.productTransactions = [];
@@ -77,7 +87,7 @@ export class NewDataFormComponent implements OnInit {
                 receiver_id: +item.receiver_id,
                 amount: +item.amount,
                 description: '',
-                status: 'PENDING',
+                state: 'PENDING',
                 insertedBy: this.userService.currentUser.id,
             });
         });
@@ -98,7 +108,7 @@ export class NewDataFormComponent implements OnInit {
     }
 
     nextTab(): void {
-        const maxTab = 6;
+        const maxTab = 3;
         if (this.tab < maxTab) {
             this.tab++;
         }
@@ -109,16 +119,15 @@ export class NewDataFormComponent implements OnInit {
             this.tab = 4;
             if (this.selectedBatch.doesItCreatesCashbookEntry()) {
                 this.cashTransactions.forEach((item: CashTransaction) => {
-                    item.description = `Payment for ${this.selectedBatch.title} - ${this.task.customerName}`; 
+                    item.description = `Payment for ${this.selectedBatch.title} - ${this.task.customerName}`;
                 });
                 // Inform about Imbalance to User
                 // Automatic Adjustment currently not feasible
-                if( this.task.amountCollected !== this.getCashBookTotal() ){
+                if ( this.task.amountCollected !== this.getCashBookTotal() ) {
                     this.tab = 2;
                     const imbalance = this.task.amountCollected - this.getCashBookTotal();
-                    alert("Adjust Amount Rs. " + imbalance);
+                    alert('Adjust Amount Rs. ' + imbalance);
                 }
-
             }
         } else if (this.selectedBatch.isPrimarily('product')) {
             this.tab = 5;
@@ -127,6 +136,9 @@ export class NewDataFormComponent implements OnInit {
             });
         } else if (this.selectedBatch.isPrimarily('cashbook')) {
             this.tab = 6;
+            this.cashTransactions.forEach((item: CashTransaction) => {
+                item.description += ` ${this.selectedBatch.title}`;
+            });
         } else {
             alert('Batch Is Empty');
             this.reset();
@@ -160,7 +172,7 @@ export class NewDataFormComponent implements OnInit {
             customerName: '',
             amountCollected: 0,
             category_id: 0,
-            status: 'INACTIVE',
+            state: 'INACTIVE',
             insertedBy: this.userService.currentUser.id,
         };
         this.selectedBatch = new Batch(0, '', 0, {});

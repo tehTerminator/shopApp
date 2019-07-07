@@ -48,10 +48,9 @@ export class AccountBalanceComponent implements OnInit {
         openingBalance: this.balance
       }
     }, true).subscribe((res: any) => {
-      console.log(res);
       this.notice.changeMessage({
         text: `SET Opening Balance ${this.postedOn} - ${this.directory.get(this.selectedAccount).name} = ${this.balance}`,
-        status: 'green'
+        state: 'green'
       });
       this.data.push({
         postedOn: this.postedOn,

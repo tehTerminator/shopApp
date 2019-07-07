@@ -36,7 +36,7 @@ export class CashBookFormComponent implements OnInit {
 						description: '',
 						insertedBy: this.userService.currentUser.id,
 						postedOn: new Date(),
-						status: this.userService.currentUser.authLevel > 5 ? 'COMPLETED' : 'PENDING'
+						state: this.userService.currentUser.authLevel > 5 ? 'COMPLETED' : 'PENDING'
 				};
 		}
 
@@ -56,13 +56,13 @@ export class CashBookFormComponent implements OnInit {
 						delete (request.andWhere);
 						this.mysql.insert('cashbook', request).subscribe(() => {
 								const notice = `Successfully inserted to cashook amount Rs. ${amount}. ${giver} to ${receiver}`;
-								this.notification.changeMessage({ text: notice, status: 'green' });
+								this.notification.changeMessage({ text: notice, state: 'green' });
 
 						});
 				} else {
 						this.mysql.update('cashbook', request).subscribe(() => {
 								const notice = `Successfully update cashbook id ${this.transaction.id} amount Rs. ${amount}. ${giver} to ${receiver}`;
-								this.notification.changeMessage({ text: notice, status: 'green' });
+								this.notification.changeMessage({ text: notice, state: 'green' });
 						});
 				}
 				this.reset();
@@ -81,7 +81,7 @@ export class CashBookFormComponent implements OnInit {
 										this.transaction.description = res.description;
 										this.transaction.postedOn = new Date(res.postedOn);
 										this.transaction.insertedBy = +res.insertedBy;
-										this.transaction.status = res.status;
+										this.transaction.state = res.state;
 								}
 						});
 		}

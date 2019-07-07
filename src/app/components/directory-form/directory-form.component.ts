@@ -54,7 +54,7 @@ export class DirectoryFormComponent implements OnInit {
     };
 
     let response: any;
-    const message = { text: 'Success', status: 'green' };
+    const message = { text: 'Success', state: 'green' };
 
     if (this.directory.id > 0) {
       // Update Directory

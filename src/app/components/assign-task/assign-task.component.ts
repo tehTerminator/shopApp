@@ -27,7 +27,7 @@ export class AssignTaskComponent implements OnInit {
       customerName: '',
       amountCollected: 0,
       category_id: 0,
-      status: 'INACTIVE',
+      state: 'INACTIVE',
       insertedBy: this.userService.currentUser.id,
       comment: ''
     };
@@ -47,7 +47,7 @@ export class AssignTaskComponent implements OnInit {
           customerName: '',
           amountCollected: 0,
           category_id: 0,
-          status: 'INACTIVE',
+          state: 'INACTIVE',
 	  insertedBy: this.userService.currentUser.id,
 	  comment: this.task.comment || ''
         };
@@ -56,9 +56,9 @@ export class AssignTaskComponent implements OnInit {
   }
 
   set() {
-    const completedStatus = ['COMPLETED', 'APPROVED'];
-    if (completedStatus.find(x => x == this.task.status)) {
-      this.notice.changeMessage({ text: 'Task Already Completed, Cannot Assign to other User.', status: 'red' });
+    const completedstate = ['COMPLETED', 'APPROVED'];
+    if (completedstate.find(x => x == this.task.state)) {
+      this.notice.changeMessage({ text: 'Task Already Completed, Cannot Assign to other User.', state: 'red' });
     } else {
       this.mysql.update('task', {
         andWhere: {
@@ -70,7 +70,7 @@ export class AssignTaskComponent implements OnInit {
       }).subscribe(() => {
         this.notice.changeMessage({
           text: `Assigned ${this.task.customerName} to ${this.userService.get(+this.selectedUserId).name}`,
-          status: 'green'
+          state: 'green'
         });
       });
     }

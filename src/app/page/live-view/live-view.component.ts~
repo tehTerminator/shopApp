@@ -25,7 +25,7 @@ export class LiveViewComponent implements OnInit {
 		  category_id: +item.category_id,
 		  insertedBy: +item.insertedBy,
 		  amountCollected: +item.amountCollected,
-		  status: item.status,
+		  state: item.state,
 		  acceptedBy: +item.acceptedBy,
 		  completedAt: new Date(item.completedAt),
 		  insertedByUser: this.userService.get(+item.insertedBy),
@@ -41,20 +41,20 @@ export class LiveViewComponent implements OnInit {
   }
 
   getColor(theTask: task): string{
-    const status = theTask.status.toLowerCase();
-    if( status === 'rejected' ){
+    const state = theTask.state.toLowerCase();
+    if( state === 'rejected' ){
         return 'inverted';
-    } else if( status === 'unpaid' ){
+    } else if( state === 'unpaid' ){
         return 'teal';
-    } else if( status === 'inactive' ){
+    } else if( state === 'inactive' ){
         if( theTask.acceptedBy > 0 ){
             return 'orange';
         }
-    } else if( status === 'active' ){
+    } else if( state === 'active' ){
         return 'red';
-    } else if( status === 'completed' ){
+    } else if( state === 'completed' ){
         return 'green';
-    } else if( status === 'blue' ){
+    } else if( state === 'blue' ){
         return 'blue';
     } else {
         return '';

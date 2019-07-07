@@ -33,14 +33,14 @@ export class LoginComponent {
 
   login() {
     let error = false;
-    const message = { text: '', status: 'positive' };
+    const message = { text: '', state: 'positive' };
     // this.message.text = [];
     if (this.username.length === 0) {
       // this.message.show = true;
       // this.message.text.push('Username cannot be empty');
       error = true;
       message.text = 'Username cannot be empty. ';
-      message.status = 'yellow';
+      message.state = 'yellow';
     }
 
     if (this.password.length === 0) {
@@ -48,7 +48,7 @@ export class LoginComponent {
       // this.message.text.push('Password cannot be empty');
       error = true;
       message.text += 'Password cannot be empty. ';
-      message.status = 'yellow';
+      message.state = 'yellow';
     }
 
     // if (this.message.show === false) {
@@ -62,14 +62,14 @@ export class LoginComponent {
       }).subscribe((response: any) => {
         if (response.length === 1) {
           const user = response[0];
-          this.notificationService.changeMessage({ text: 'Sucessfully Logged In', status: 'green' });
+          this.notificationService.changeMessage({ text: 'Sucessfully Logged In', state: 'green' });
           this.userService.currentUser = new User(user.id, user.name, Number(user.authLevel));
           this.router.navigate(['/home']);
         } else {
           // this.message.show = true;
           // this.message.text.push('Invalid Username Or Password');
           error = true;
-          this.notificationService.changeMessage({ text: 'Invalid Username or Password', status: 'red' });
+          this.notificationService.changeMessage({ text: 'Invalid Username or Password', state: 'red' });
         }
       });
     } else {

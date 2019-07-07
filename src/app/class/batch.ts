@@ -99,6 +99,11 @@ export class Batch {
         }
     }
 
+    isFixed(): boolean {
+        const flexibleTransactions = this.getCashBookSettings().filter(x => +x.amount === 0 ).length;
+        return flexibleTransactions === 0;
+    }
+
     isPrimarily(theType: string): boolean {
         return this.getType() === theType;
     }

@@ -1,14 +1,22 @@
 <app-main-nav-bar></app-main-nav-bar>
-<div class="ui three column divided padded stackable grid">
-  <aside class="three wide desktop only column">
+<div [class]="columnCount()">
+  <aside class="three wide desktop only column" *ngIf="asideLeft">
     <app-cash-details></app-cash-details>
   </aside>
-  <div class="ten wide column">
+  <div [class]="getWidth()">
+    <a class="ui mini icon button" (click)="toggleLeftSideBar()">
+      <i class="angle double left icon" [hidden]="!asideLeft"></i>
+      <i class="angle double right icon" [hidden]="asideLeft"></i>
+    </a>
+    <a class="ui mini right floated icon button" (click)="toggleRightSideBar()">
+      <i class="angle double right icon" [hidden]="!asideRight"></i>
+      <i class="angle double left icon"[hidden]="asideRight"></i>
+    </a>
     <div class="ui basic segment">
       <router-outlet></router-outlet>
     </div>
   </div>
-  <div class="three wide desktop only column">
+  <div class="three wide desktop only column" [hidden]="!asideRight">
     <app-notification-segment></app-notification-segment>
   </div>
 </div>

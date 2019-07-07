@@ -6,7 +6,7 @@ import { BehaviorSubject } from 'rxjs';
 })
 export class NotificationService {
 
-  private messageSource = new BehaviorSubject({ id: undefined, text: 'Welcome', status: 'green' });
+  private messageSource = new BehaviorSubject({ id: undefined, text: 'Welcome', state: 'green' });
   currentMessage = this.messageSource.asObservable();
 
   constructor() { }

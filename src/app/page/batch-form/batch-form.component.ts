@@ -49,7 +49,7 @@ export class BatchFormComponent implements OnInit {
       this.notificationService.changeMessage({
         id: res.lastInsertId,
         text: `Created new Batch ${this.theBatch.title} of type - ${this.theBatch.getType()}`,
-        status: 'green'
+        state: 'green'
       });
       this.reset();
     });

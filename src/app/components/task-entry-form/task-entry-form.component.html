@@ -1,0 +1,42 @@
+  <div class="ui form segment">
+    <div class="field">
+      <label for="batch">Select Type</label>
+      <select class="ui fluid selection dropdown" name="selectedBatch" (change)="extractDetails()" [(ngModel)]="selectedBatch">
+        <option *ngFor="let b of batch" [value]="b.id">
+          {{ b.title }} - {{ b.rate }}
+        </option>
+      </select>
+    </div>
+    <div class="field">
+      <label for="customerName">Customer Name</label>
+      <div class="ui input">
+        <input type="text" #name name="customerName" [(ngModel)]="task.customerName" (input)="onSearchChange($event.target.value)">
+      </div>
+    </div>
+    <hr *ngIf="showSuggestion">
+    <a class="ui blue label" *ngFor="let name of suggestion" (click)="useSuggestion(name)">
+      {{ name }}
+    </a>
+    <hr *ngIf="showSuggestion">
+    <div class="field">
+      <label for="amountCollected">Amount Collected</label>
+      <div class="ui input">
+        <input type="number" disabled="disabled" name="amountCollected" [(ngModel)]="task.amountCollected" min="0" step="1">
+      </div>
+    </div>
+
+    <div class="field">
+      <label for="paymentstate">state</label>
+      <select name="state" [(ngModel)]="task.state">
+        <option value="INACTIVE" selected="selected">INACTIVE</option>
+        <option value="UNPAID">UNPAID</option>
+        <option value="COMPLETED">COMPLETED</option>
+      </select>
+    </div>
+  <button class="ui green button" [hidden]="task.customerName.length <= 2" (click)="save()">
+    Save
+  </button>
+  <button class="ui red button" (click)="reset()">
+    Reset
+  </button>
+</div>

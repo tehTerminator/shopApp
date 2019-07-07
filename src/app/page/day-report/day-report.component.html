@@ -1,34 +1,29 @@
-<div class="ui menu">
-		<div class="ui header item">Day Report</div>
-		<div class="item">
-				<div class="ui input">
-						<input type="date" [(ngModel)]="theDate">
-				</div>
+	<div class="ui menu">
+	<div class="ui header item">Day Report</div>
+	<div class="item">
+		<div class="ui input">
+			<input type="date" [(ngModel)]="theDate">
 		</div>
+	</div>
+	<div class="item">
+		<select name="account" class="ui selection dropdown" [(ngModel)]="selectedAccount">
+			<option *ngFor="let ac of dir.getAccounts()" [disabled]="isInList(ac.name)" [value]="ac.id">{{ac.name}}</option>
+		</select>
+	</div>
+	<a (click)="addToList()" class="item">Add</a>
+	<div class="right menu">
+		<a class="item"></a>
+	</div>
 </div>
 
 <div class="ui segment">
-	<div class="ui doubling cards">
-		<div class="ui card">
-			<app-account-card theName="sales" [theDate]="theDate"></app-account-card>
-		</div>
-		<div class="ui card">
-			<app-account-card theName="commission" [theDate]="theDate"></app-account-card>
-		</div>
-		<div class="ui card">
-			<app-account-card theName="expense" [theDate]="theDate"></app-account-card>
-		</div>
-		<div class="ui card">
-			<app-account-card theName="shop" [theDate]="theDate" showMeta="true"></app-account-card>
-		</div>
-		<div class="ui card">
-			<app-account-card theName="mponline" [theDate]="theDate" showMeta="true"></app-account-card>
-		</div>
-		<div class="ui card">
-			<app-account-card theName="csc" [theDate]="theDate" showMeta="true"></app-account-card>
-		</div>
-		<div class="ui card">
-			<app-account-card theName="sbi maharaja" [theDate]="theDate" showMeta="true"></app-account-card>
+	<div class="ui cards">
+		<div class="ui card" *ngFor="let account of accountList">
+			<app-account-card [theName]="account" [theDate]="theDate"></app-account-card>
+			<hr>
+			<a class="ui bottom attached center aligned red label" (click)="removeFromList(account)">
+				Remove Card
+			</a>
 		</div>
 	</div>
 </div>

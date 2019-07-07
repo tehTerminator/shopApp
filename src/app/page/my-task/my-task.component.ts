@@ -1,20 +1,25 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, OnDestroy } from '@angular/core';
 import { MySQLService } from './../../service/my-sql.service';
 import { DirectoryService } from './../../service/directory.service';
 import { UserService } from './../../service/user.service';
 import { NotificationService } from './../../service/notification.service';
 import { Task } from './../../interface/task';
+import { interval } from 'rxjs';
 
 @Component({
   selector: 'app-my-task',
   templateUrl: './my-task.component.html',
   styleUrls: ['./my-task.component.css']
 })
-export class MyTaskComponent implements OnInit {
+export class MyTaskComponent implements OnInit, OnDestroy {
   assigned: Array<Task> = [];
   unassigned: Array<Task> = [];
   theDate: Date = new Date();
+  authLevel = 0;
   searchText = "";
+  showAll = false;
+  private timerSubscription: any;
+
 
   constructor(
     private db: MySQLService,
@@ -24,45 +29,76 @@ export class MyTaskComponent implements OnInit {
   ) { }
 
   ngOnInit() {
+    this.authLevel = +this.users.currentUser.authLevel;
     this.getAssigned();
     this.getUnassigned();
+    const timer = interval(1000 * 60);
+    this.timerSubscription = timer.subscribe(() => {
+      this.getAssigned();
+      this.getUnassigned();
+    });
+  }
+
+  ngOnDestroy() {
+    if( this.timerSubscription ){
+      this.timerSubscription.unsubscribe();
+      console.log('Timer No More');
+    }
   }
 
   getAssigned(): void {
     this.assigned = [];
     const request = {
       andWhere: {
-        status: ['NOT IN', 'COMPLETED', 'REJECTED', 'APPROVED'],
+        state: ['NOT IN', 'COMPLETED', 'REJECTED', 'APPROVED'],
         acceptedBy: this.users.currentUser.id
       }
     };
     this.get(request);
   }
 
+  toggleShowAll(): void {
+    this.showAll = !this.showAll;
+  }
+
   getUnassigned(): void {
     this.unassigned = [];
     const request = {
       andWhere: {
-        status: ['NOT IN', 'COMPLETED', 'REJECTED', 'APPROVED'],
-        acceptedBy: 0
+        state: ['NOT IN', 'COMPLETED', 'REJECTED', 'APPROVED'],
+        acceptedBy: 0,
+        'DATE(insertedAt)': this.theDate
       }
     };
+
+    if (this.showAll) {
+      delete (request.andWhere['DATE(insertedAt)']);
+    }
     this.get(request);
   }
 
   assignTask(theTask: Task) {
     const index = this.unassigned.indexOf(theTask);
+
+    if (theTask.state === "UNPAID") {
+      if (confirm("Task is Unpaid, Do You Wish to Mark it Paid ?")) {
+        this.updateCashbook(theTask.id, 'PENDING');
+      } else {
+        return;
+      }
+    }
+
     if (index >= 0) {
       theTask.acceptedBy = this.users.currentUser.id;
       theTask.acceptedByUser = this.users.currentUser;
-      theTask.status = "INACTIVE";
+      theTask.state = "INACTIVE";
 
       this.assigned.push(theTask);
       this.unassigned.splice(index, 1);
       this.db.update('task', {
         userData: {
           acceptedBy: this.users.currentUser.id,
-          status: 'INACTIVE'
+          state: 'INACTIVE'
         },
         andWhere: {
           id: theTask.id
@@ -71,30 +107,31 @@ export class MyTaskComponent implements OnInit {
         this.notice.changeMessage({
           id: theTask.id,
           text: `Assigned ${theTask.customerName} to ${this.users.currentUser.name}`,
-          status: 'green'
+          state: 'green'
         });
+        this.searchText = '';
       });
     } else {
       this.notice.changeMessage({
         id: theTask.id,
         text: `Something went wrong with task of ${theTask.customerName}`,
-        status: 'red'
+        state: 'red'
       });
     }
   }
 
-  unassignTask(theTask: Task) {
+  unselect(theTask: Task) {
     const index = this.assigned.indexOf(theTask);
     if (index >= 0) {
       theTask.acceptedBy = -1;
       theTask.acceptedByUser = undefined;
-      theTask.status = "INACTIVE";
+      theTask.state = "INACTIVE";
       this.unassigned.push(theTask);
       this.assigned.splice(index, 1);
       this.db.update('task', {
         userData: {
-          acceptedBy: -1,
-          status: 'INACTIVE'
+          acceptedBy: 0,
+          state: 'INACTIVE'
         },
         andWhere: {
           id: theTask.id
@@ -103,51 +140,104 @@ export class MyTaskComponent implements OnInit {
         this.notice.changeMessage({
           id: theTask.id,
           text: `Unassigned ${theTask.customerName}`,
-          status: 'green'
+          state: 'green'
         });
+        this.unassigned.sort((a, b) => { return a.id - b.id });
       });
     } else {
       this.notice.changeMessage({
         id: theTask.id,
         text: `Something went wrong with task of ${theTask.customerName}`,
-        status: 'red'
+        state: 'red'
       });
     }
   }
 
-  markComplete(theTask: Task) {
+  setCompleted(theTask: Task) {
     const index = this.assigned.indexOf(theTask);
     if (index >= 0) {
-      theTask.status = "COMPLETED";
+      theTask.state = "COMPLETED";
       this.db.update('task', {
         userData: {
           acceptedBy: this.users.currentUser.id,
-          status: "COMPLETED",
+          state: "COMPLETED",
           completedAt: this.getMysqlDate()
         },
         andWhere: {
           id: theTask.id
         }
-      }).subscribe(()=>{
+      }).subscribe(() => {
         this.assigned.splice(index, 1);
         this.notice.changeMessage({
           id: theTask.id,
           text: `Completed ${theTask.categoryName} of ${theTask.customerName}`,
-          status: 'green'
-        })
+          state: 'green'
+        });
+        this.updateCashbook(theTask.id, 'COMPLETED');
       });
     } else {
       this.notice.changeMessage({
         id: theTask.id,
         text: `Something went wrong with task of ${theTask.customerName}`,
-        status: 'red'
+        state: 'red'
       });
     }
   }
 
+  setActive(theTask: Task) {
+    this.setstate(theTask, 'ACTIVE');
+    theTask.state = 'ACTIVE';
+  }
+
+  setInactive(theTask: Task) {
+    this.setstate(theTask, 'INACTIVE')
+    theTask.state = 'INACTIVE';
+  }
+
+  setRejected(theTask: Task) {
+    const index = this.assigned.indexOf(theTask);
+    this.setstate(theTask, 'REJECTED');
+    theTask.state = 'REJECTED';
+    this.assigned.splice(index, 1);
+    this.updateCashbook(theTask.id, theTask.state);
+  }
+
+  private updateCashbook(id: number, thestate: string): void {
+    this.db.select('taskcashbook', {
+      andWhere: {
+        task_id: id
+      }
+    }).subscribe((res: any) => {
+      Array.from(res).forEach((item: any) => {
+        this.db.update('cashbook', {
+          andWhere: {
+            id: item.cashbook_id
+          },
+          userData: {
+            state: thestate
+          }
+        });
+      });
+    });
+  }
+
+  private setstate(theTask: Task, thestate: string) {
+    this.db.update('task', {
+      andWhere: {
+        id: theTask.id
+      },
+      userData: {
+        state: thestate
+      }
+    }).subscribe(() => {
+      theTask.state = thestate;
+    })
+  }
+
   private get(request: any): void {
-    this.db.select('task', request).subscribe((res: any) => {
-      Array.from(res).forEach((item: Task) => {
+    this.db.select('task', request, true).subscribe((res: any) => {
+      // console.log(res);
+      Array.from(res.rows).forEach((item: Task) => {
         const task = {
           id: item.id,
           customerName: item.customerName,
@@ -160,10 +250,10 @@ export class MyTaskComponent implements OnInit {
           acceptedByUser: +item.acceptedBy > 0 ? this.users.get(+item.acceptedBy) : undefined,
           completedAt: item.completedAt,
           amountCollected: +item.amountCollected,
-          status: item.status,
+          state: item.state,
           comment: item.comment
         };
-        if( task.acceptedBy === 0 ){
+        if (task.acceptedBy === 0) {
           this.unassigned.push(task);
         } else {
           this.assigned.push(task);
@@ -172,7 +262,7 @@ export class MyTaskComponent implements OnInit {
     });
   }
 
-  private getMysqlDate(): string{
+  private getMysqlDate(): string {
     let output = '';
     const d = new Date();
     output += `${this.pad(d.getFullYear(), 2)}-${this.pad(d.getMonth() + 1, 2)}-${this.pad(d.getDate(), 2)} `;
@@ -180,13 +270,33 @@ export class MyTaskComponent implements OnInit {
     return output;
   }
 
-  private pad( n: number, width: number ): string{
-  width -= n.toString().length;
-  if ( width > 0 )
-  {
-    return new Array( width + (/\./.test( n.toString() ) ? 2 : 1) ).join( '0' ) + n;
+  private pad(n: number, width: number): string {
+    width -= n.toString().length;
+    if (width > 0) {
+      return new Array(width + (/\./.test(n.toString()) ? 2 : 1)).join('0') + n;
+    }
+    return n + ""; // always return a string
   }
-  return n + ""; // always return a string
-}
+
+  getColor(theTask: Task): string{
+    const state = theTask.state.toLowerCase();
+    if( state === 'rejected' ){
+        return 'inverted';
+    } else if( state === 'unpaid' ){
+        return 'teal';
+    } else if( state === 'inactive' ){
+        if( theTask.acceptedBy > 0 ){
+            return 'orange';
+        }
+    } else if( state === 'active' ){
+        return 'red';
+    } else if( state === 'completed' ){
+        return 'green';
+    } else if( state === 'blue' ){
+        return 'blue';
+    } else {
+        return '';
+    }
+  }
 
 }

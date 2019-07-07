@@ -45,8 +45,8 @@
       <input type="number" min="0" step="0.01" name="amountCollected" [(ngModel)]="task.amountCollected">
     </div>
     <div class="field">
-      <label for="paymentStatus">Status</label>
-      <select name="status" [(ngModel)]="task.status">
+      <label for="paymentstate">state</label>
+      <select name="state" [(ngModel)]="task.state">
         <option value="INACTIVE" selected="selected">INACTIVE</option>
         <option value="UNPAID">UNPAID</option>
         <option value="COMPLETED">COMPLETED</option>

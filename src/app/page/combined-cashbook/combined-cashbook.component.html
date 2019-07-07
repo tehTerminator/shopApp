@@ -1,0 +1,50 @@
+<div class="ui two column grid">
+  <div class="four wide column">
+    <div class="ui fluid action input">
+      <input type="date" name="theDate" [(ngModel)]="postedOn">
+      <button class="ui blue button" (click)="get()">
+        GET
+      </button>
+    </div>
+    <hr>
+    <app-cash-book-form></app-cash-book-form>
+  </div>
+  <div class="twelve wide column scrollable">
+    <table class="ui compact table raised segment">
+      <thead>
+        <tr>
+          <th>#</th>
+          <th>Posted On</th>
+          <th>Transfer</th>
+          <th>Amount</th>
+          <th>Description</th>
+          <th>state</th>
+          <th>Inserted By</th>
+          <th>
+            Action
+            <i class="icon fighter jet" (click)="approveAll()"></i>
+          </th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr *ngFor="let t of transactions">
+          <td>{{ t.id }}</td>
+          <td>{{ t.postedOn | date:'hh:mm aa' }}</td>
+          <td>{{ t.giver }} to {{ t.receiver }}</td>
+          <td>{{ t.amount }}</td>
+          <td>{{ t.description }}</td>
+          <td>{{ t.state }}</td>
+          <td>{{ t.userName }}</td>
+          <td>
+            <button class="ui mini green circular icon button" (click)="approve(t)">
+              <i class="icon checkmark"></i>
+            </button>
+            <button class="ui mini red circular icon button" (click)="reject(t)">
+              <i class="icon trash"></i>
+            </button>
+          </td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+</div>

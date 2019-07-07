@@ -1,6 +1,6 @@
 import { ProductTransaction } from './../interface/product-transaction';
 import { Task } from './../interface/task';
-import { Injectable } from '@angular/core';
+import { Injectable, ɵConsole } from '@angular/core';
 import { MySQLService } from './my-sql.service';
 import { CashTransaction } from '../interface/cash-transaction';
 import { NotificationService } from './notification.service';
@@ -13,6 +13,9 @@ export class BatchService {
   task: Task;
   productTran: Array<ProductTransaction> = [];
   cashTran: Array<CashTransaction> = [];
+  private cashbookSaved = false;
+  private taskInserted = false;
+  privete; productInserted = false;
 
   constructor(
     private mysql: MySQLService,
@@ -22,7 +25,7 @@ export class BatchService {
       customerName: '',
       insertedBy: 0,
       amountCollected: 0,
-      status: 'INACTIVE',
+      state: 'INACTIVE',
       category_id: 0
     };
   }
@@ -31,48 +34,71 @@ export class BatchService {
     this.task = theTask;
     this.cashTran = cashT;
     this.productTran = prodT;
+    this.cashbookSaved = false;
+    this.taskInserted = false;
+    this.productInserted = false;
   }
 
   public save(): void {
-    if (this.task.category_id > 0) {
-      this.saveTask();
-    } else if (this.productTran.length > 0) {
-      this.equalizeCashBook();
-      this.saveProducts();
-    } else {
+    this.equalizeCashBook();
+    this.saveTask();
+    this.saveProducts();
+
+    if( this.task.category_id === 0 && this.productTran.length === 0 ){
       this.saveCashBookEntry(true);
     }
+
   }
 
   /**
    * Saves Task Details
    */
   private saveTask(): void {
+    if ( this.task.category_id === 0 ) {
+      return;
+    }
+
+    if ( this.taskInserted ) {
+      return;
+    }
+
     delete (this.task.id);
-    if (this.task.status === 'COMPLETED') {
+    if (this.task.state === 'COMPLETED') {
       this.task.acceptedBy = this.task.insertedBy;
       this.task.completedAt = this.toMySqlDateFormat(new Date());
     }
+
+    if (this.task.customerName.length === 0) {
+      this.notice.changeMessage({ text: 'Customer Name too Short', state: 'red' });
+      return;
+    }
+
+    const message = `${this.task.customerName}. Inserted successfully`;
     this.mysql.insert('task', {
       userData: this.task
     }, true).subscribe((res: any) => {
       this.task.id = res.lastInsertId;
-      const message = `${this.task.customerName}. Inserted successfully`;
-      this.notice.changeMessage({ id: this.task.id, text: message, status: 'green' });
+      this.notice.changeMessage({ id: this.task.id, text: message, state: 'green' });
       this.saveProducts();
       if (this.task.amountCollected > 0) {
         this.saveCashBookEntry(false);
       }
     });
+    this.taskInserted = true;
   }
 
   /**
    * Saves the Product Transaction
    */
   private saveProducts(): void {
+    if ( this.productInserted ) {
+      return;
+    }
+
     if (this.areTransactionEmpty(this.productTran)) {
       return;
     } else {
+      this.productInserted = true;
       Array.from(this.productTran).forEach((item: ProductTransaction) => {
         const message = `Inserted ${item.productName} for Rs.${item.amount}`;
         delete (item.id);
@@ -84,7 +110,7 @@ export class BatchService {
           }).subscribe(() => {
             this.notice.changeMessage({
               text: message,
-              status: 'green'
+              state: 'green'
             });
           });
         }
@@ -98,25 +124,32 @@ export class BatchService {
    * If there is any other Cashbook Transaction Involved then also amount is calculated.
    */
   private equalizeCashBook(): void {
-    if (this.getTotal(this.productTran) <= this.getTotal(this.cashTran)) {
+    if (this.productTran.length === 0) {
       return;
     }
-    if (this.productTran.length > 0) {
-      // if there is only on transaction then full amount is from sales Account
-      const prodTransTotal = this.getTotal(this.productTran);
-      const salesAccountId = this.ds.find('sales').id;
-      if (this.cashTran.length === 0) {
-        this.cashTran[0].amount = prodTransTotal;
-      } else {
-        // If there are multiple cashbook transaction then the sales amount is calculated by
-        // deducting the sum of amount of transactions except Sales account from total Product Transaction Amount
-        // rest is saved in Sales Transaction amount
-        const salesTransaction = this.cashTran.find(x => x.giver_id === salesAccountId);
-        const difference = this.getTotal(this.cashTran) - salesTransaction.amount;
-        salesTransaction.amount = prodTransTotal - difference;
-      }
+
+    if (this.getTotal(this.productTran) < this.getTotal(this.cashTran)) {
+      this.setSalesAmount(this.getTotal(this.productTran));
+    } else {
+      this.setSalesAmount(this.getTotal(this.productTran) - this.getAmountExceptSales());
+    }
+
+  }
+
+  private getAmountExceptSales(): number {
+    const salesId = this.ds.find('sales').id;
+    const otherTc = this.cashTran.filter(x => +x.giver_id !== +salesId);
+    return this.getTotal(otherTc);
+  }
+
+  private setSalesAmount(amount: number): void {
+    const salesId = this.ds.find('sales').id;
+    const salesTrans = this.cashTran.find(x => +x.giver_id === +salesId);
+    if (salesTrans !== undefined) {
+      salesTrans.amount = amount;
     }
   }
+
 
   private areTransactionEmpty(transactionArray: Array<any>): boolean {
     let total = 0;
@@ -126,10 +159,19 @@ export class BatchService {
     return total === 0;
   }
 
+  /**
+   * Save Cashbook to Database
+   * @param cashbookOnly if batch contains only cashbook Entries
+   */
   private saveCashBookEntry(cashbookOnly: boolean): void {
+    if (this.cashbookSaved) {
+      return;
+    }
+
     if (this.areTransactionEmpty(this.cashTran)) {
       return;
     } else {
+      this.cashbookSaved = true;
       Array.from(this.cashTran).forEach((item: CashTransaction) => {
         if (item.amount > 0) {
           delete (item.id);
@@ -143,9 +185,11 @@ export class BatchService {
               this.linkTaskAndCashBook(this.task.id, item.id);
               if (cashbookOnly) {
                 this.notice.changeMessage({
-                  // tslint:disable-next-line:max-line-length
-                  text: `Cashbook Entry Created ${this.ds.get(item.giver_id).name} => ${this.ds.get(item.receiver_id).name} Rs. ${item.amount}`,
-                  status: 'green'
+                  id: res.lastInsertId,
+                  text: `Cashbook Entry Created
+                  ${this.ds.get(item.giver_id).name} =>
+                  ${this.ds.get(item.receiver_id).name} Rs. ${item.amount}`,
+                  state: 'green'
                 });
               }
             });

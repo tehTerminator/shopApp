@@ -1,10 +1,20 @@
-<div class="ui top attached header">
+<div class="ui top attached inverted header">
   Cashbook Form
 </div>
-<div class="ui bottom attached form segment">
+<div class="ui bottom attached stacked form segment">
   <div class="field">
     <label for="id">#</label>
     <input type="number" name="id" min="0" step="1" [(ngModel)]="transaction.id" (change)="get()">
+  </div>
+  <div class="two fields" *ngIf="transaction.id > 0">
+    <div class="field">
+      <label for="theDate">Date</label>
+      <input type="text" [(ngModel)]="theDate" mask="0000-M0-d0" [showMaskTyped] = "true">
+    </div>
+    <div class="field">
+      <label for="theTime">Time</label>
+      <input type="text" [(ngModel)]="theTime" mask="Hh:m0:s0" [showMaskTyped] = "true">
+    </div>
   </div>
   <div class="two fields">
     <div class="field">
@@ -30,4 +40,7 @@
   </div>
   <button class="ui green button" (click)="save()">Submit</button>
   <button class="ui red button" (click)="reset()">Reset</button>
+  <button class="ui right floated circular red icon button" [hidden]="transaction.id===0" (click)="delete()">
+    <i class="trash icon"></i>
+  </button>
 </div>

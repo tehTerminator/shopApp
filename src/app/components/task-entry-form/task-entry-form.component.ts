@@ -1,0 +1,141 @@
+import { Component, OnInit, ViewChild, ElementRef } from '@angular/core';
+import { MySQLService } from '../../service/my-sql.service';
+import { UserService } from '../../service/user.service';
+import { Batch } from '../../class/batch';
+import { Task } from '../../interface/task';
+import { BatchService } from '../../service/batch.service';
+import { CashTransaction } from '../../interface/cash-transaction';
+import { ProductTransaction } from '../../interface/product-transaction';
+
+@Component({
+  selector: 'app-task-entry-form',
+  templateUrl: './task-entry-form.component.html',
+  styleUrls: ['./task-entry-form.component.css']
+})
+export class TaskEntryFormComponent implements OnInit {
+  @ViewChild('name') nameField: ElementRef;
+  selectedBatch = 0;
+  batch: Array<Batch> = [];
+  suggestion: Array<string> = [];
+  task: Task;
+  showSuggestion = false;
+  cashTransactions: Array<CashTransaction> = [];
+  productTransactions: Array<ProductTransaction> = [];
+
+  constructor(
+    private db: MySQLService,
+    private us: UserService,
+    private bs: BatchService,
+  ) { }
+
+  ngOnInit() {
+    // Initialize Task;
+    this.task = {
+      customerName: '',
+      category_id: 0,
+      insertedBy: this.us.currentUser.id,
+      amountCollected: 0,
+      state: 'INACTIVE',
+    };
+    // Load Batch Task from Server
+    this.db.select('batch').subscribe((res: any) => {
+      const allBatch = [];
+      Array.from(res).forEach((s: any) => {
+        allBatch.push(new Batch(s.id, s.title, s.rate, s.settings));
+      });
+      this.batch = allBatch.filter((x: Batch) => (x.isPrimarily('task') && x.isFixed()) );
+    });
+  }
+  
+  onSearchChange(searchValue: string) {
+    const word = this.task.customerName.split(' ').pop() + '%';
+    if (word.length >= 3) {
+      this.db.select('suggestion', {
+        andWhere: {
+          theName: ['LIKE', word]
+        }
+      }).subscribe((res: any) => {
+        this.suggestion = [];
+        res.forEach((item: any) => {
+          this.suggestion.push(item.theName);
+        });
+        this.showSuggestion = this.suggestion.length > 0;
+      });
+    } else {
+      this.showSuggestion = false;
+      this.suggestion = [];
+    }
+  }
+
+  useSuggestion(theName: string) {
+    const wordArray = this.task.customerName.split(' ');
+    wordArray.pop();
+    wordArray.push(theName);
+    this.task.customerName = wordArray.join(' ');
+    this.nameField.nativeElement.focus();
+  }
+
+  save() {
+    // Update Word Dictionary
+    const wordArray = this.task.customerName.split(' ');
+    wordArray.forEach((item: string) => {
+      this.db.insert('suggestion', {
+        userData: {
+          theName: item
+        }
+      }, true).subscribe((res: any)=>{
+        console.log(res.query);
+      })
+    });
+
+    // Update Description of Cashbook Entries
+    const jobType = this.batch.find(x => +x.id === +this.selectedBatch ).title;
+    this.cashTransactions.forEach((item: CashTransaction) => {
+      item.description = `${this.task.customerName} - ${jobType}`;
+    });
+
+    // Submit Data
+    this.bs.set(this.task, this.cashTransactions, this.productTransactions);
+    this.bs.save();
+    this.reset();
+
+  }
+
+  extractDetails() {
+    const b = this.batch.find(x => +x.id === +this.selectedBatch);
+
+    let entries = b.getProductSettings();
+    this.productTransactions = [];
+    entries.forEach((item: any) => {
+      this.productTransactions.push({
+        product_id: +item.product_id,
+        quantity: +item.quantity,
+        amount: item.amount !== undefined ? +item.amount : 0,
+      });
+    });
+
+    entries = b.getCashBookSettings();
+    this.cashTransactions = [];
+    entries.forEach((item: any) => {
+      this.cashTransactions.push({
+        giver_id: +item.giver_id,
+        receiver_id: +item.receiver_id,
+        amount: +item.amount,
+        description: '',
+        state: 'PENDING',
+        insertedBy: this.us.currentUser.id,
+      });
+    });
+
+    if (b.doesItCreatesTask()) {
+      this.task.category_id = +b.getTaskSettings()[0].category_id;
+      this.task.amountCollected = +b.rate;
+    }
+  }
+
+  reset(): void {
+    this.task.customerName = '';
+    this.task.state = 'INACTIVE';
+    this.nameField.nativeElement.focus();
+  }
+}

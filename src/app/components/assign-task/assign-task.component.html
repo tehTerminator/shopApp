@@ -1,7 +1,7 @@
-<div class="ui top attached header">
+<div class="ui top attached inverted header">
   Assign Task
 </div>
-<div class="ui bottom attached form segment">
+<div class="ui bottom attached form stacked segment">
   <div class="ui fluid action input">
     <input type="number" name="id" min="0" step="1" (change)="get()" [(ngModel)]="taskId">
     <button class="ui icon button" (click)="get()">
@@ -20,7 +20,7 @@
       Inserted At : <strong>{{ task.insertedAt | date: 'short'}}</strong>
     </div>
     <div class="item">
-      Status : <strong> {{ task.status }}</strong>
+      state : <strong> {{ task.state }}</strong>
     </div>
     <div class="item" [hidden]="task.comment === null || task.comment.length === 0">
       Description: <strong>{{ task.comment }}</strong>
@@ -35,5 +35,5 @@
     </select>
   </div>
 
-  <button class="ui fluid button" [hidden]="taskId===0" (click)="set()">Assign</button>
+  <button class="ui fluid button" [hidden]="taskId===0 || task.state === 'COMPLETED' " (click)="set()">Assign</button>
 </div>

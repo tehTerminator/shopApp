@@ -4,11 +4,12 @@ export interface CashTransaction {
     receiver_id: number;
     amount: number;
     description: string;
-    status: string;
+    state: string;
     insertedBy: number;
     postedOn?: Date;
     giver?: string;
     receiver?: string;
     userName?: string;
     balance?: number;
+    match?: boolean;
 }

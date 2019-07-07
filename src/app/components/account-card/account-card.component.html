@@ -1,18 +1,23 @@
-<div class="ui top attached header">
+<div class="ui top attached inverted header">
     {{ theName | uppercase }}
 </div>
 <div class="center aligned content">
-    <div class="description">
-        <div class="ui statistic">
-            <div class="value">
-                {{ total | abs | number: '1.2-2'  }}
+    <div [hidden]="accountId === 0">
+        <div class="description">
+            <div class="ui statistic">
+                <div class="value">
+                    {{ total | abs | number: '1.2-2'  }}
+                </div>
             </div>
         </div>
+        <div class="meta" [hidden]="!showMeta">
+            <div class="ui red label">{{ given | number: '1.2-2' }}</div>
+            <div class="ui green label">{{ received | number: '1.2-2' }}</div>
+            <hr>
+            Opening Balance {{ total - received + given | number: '1.2-2' }}
+        </div>
     </div>
-    <div class="meta" [hidden]="!showMeta">
-        <div class="ui inverted red label">{{ given | number: '1.2-2' }}</div>
-        <div class="ui inverted green label">{{ received | number: '1.2-2' }}</div>
-        <hr>
-        Opening Balance {{ total - received + given | number: '1.2-2' }}
+    <div [hidden]="(accountId > 0)">
+        Sorry {{ theName }} does not Exist
     </div>
 </div>

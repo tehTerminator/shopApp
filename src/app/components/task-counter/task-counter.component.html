@@ -1,0 +1,11 @@
+<div class="ui segment">
+    <div *ngFor="let id of getCategoryIds()" class="ui mini statistic">
+        <div class="value">
+            {{ data[id].completed }} / {{ data[id].total }}
+        </div>
+        <div class="label">
+            {{ data[id].category }}
+        </div>
+    </div>
+</div>
+<hr>

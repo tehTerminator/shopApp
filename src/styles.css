@@ -1,5 +1,43 @@
 /* You can add global styles to this file, and also import other style files */
 .scrollable{
-    max-height: 650px;
-    overflow-x: scroll;
+    max-height: 600px;
+    overflow-y: scroll;
+}
+
+.scrollable.half{
+    max-height: 300px;
+    overflow-y: scroll;
+}
+
+.extra-margin{
+    margin: 10px !important;
+}
+
+.underline{
+    text-decoration: underline;
+}
+
+
+/* Mobile first queries */
+
+/* Larger than mobile */
+@media (max-width: 768px) {
+    .desktop.only {
+        display: none!important
+    }
+}
+
+/* Larger than tablet */
+@media (min-width: 750px) {
+
+}
+
+/* Larger than desktop */
+@media (min-width: 1000px) {
+
+}
+
+/* Larger than Desktop HD */
+@media (min-width: 1200px) {
+
 }

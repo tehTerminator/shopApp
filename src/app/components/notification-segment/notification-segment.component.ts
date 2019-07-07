@@ -10,7 +10,7 @@ import { NotificationService } from '../../service/notification.service';
       Notifications
       </div>
     </div>
-    <div class="ui segment" *ngFor="let message of messageQueue" [ngClass]="message.status">
+    <div class="ui scrollable segment" *ngFor="let message of messageQueue" [ngClass]="message.state">
     <div class="ui left ribbon red label" [hidden]="message.id === undefined">{{ message.id }}</div>
     {{ message.text }}
     <hr>
@@ -28,13 +28,13 @@ export class NotificationSegmentComponent implements OnInit {
   }
 
   pushMessage(theMessage: any) {
-    const MAX_LENGTH = 6;
+    const MAX_LENGTH = 10;
     if (this.messageQueue.length < MAX_LENGTH) {
       this.messageQueue.unshift({
         id: theMessage.id,
         timestamp: new Date(),
         text: theMessage.text,
-        status: typeof (theMessage.status) === undefined ? 'green' : theMessage.status,
+        state: typeof (theMessage.state) === undefined ? 'green' : theMessage.state,
       });
     } else {
       this.messageQueue.splice(MAX_LENGTH - 1, 1);

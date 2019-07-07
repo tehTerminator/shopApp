@@ -15,6 +15,11 @@ import { ReportComponent } from './../../app/page/report/report.component';
 import { NgModule } from '@angular/core';
 import { RouterModule, Routes } from '@angular/router';
 import { MyTaskComponent } from '../../app/page/my-task/my-task.component';
+import { CombinedCashbookComponent } from '../../app/page/combined-cashbook/combined-cashbook.component';
+import { OperatorReportComponent } from './../../app/page/operator-report/operator-report.component';
+import { CalendarViewComponent } from '../../app/page/calendar-view/calendar-view.component';
+import { WordListComponent } from '../../app/page/word-list/word-list.component';
+import { DailyEarningComponent } from '../../app/page/daily-earning/daily-earning.component';
 
 const routes: Routes = [
   {
@@ -52,7 +57,8 @@ const routes: Routes = [
   },
   {
     path: 'batch/create', component: BatchFormComponent
-  }, {
+  },
+  {
     path: 'cashbook/balance', component: AccountBalanceComponent
   },
   {
@@ -63,6 +69,21 @@ const routes: Routes = [
   },
   {
     path: 'task/myTask', component: MyTaskComponent
+  },
+  {
+    path: 'cashbook/combined', component: CombinedCashbookComponent
+  },
+  {
+    path: 'report/operator', component: OperatorReportComponent
+  },
+  {
+    path: 'report/acMonthly', component: CalendarViewComponent
+  },
+  {
+    path: 'admin/dictionary', component: WordListComponent
+  },
+  {
+    path: 'report/dailyEarning', component: DailyEarningComponent
   }
 
 ];

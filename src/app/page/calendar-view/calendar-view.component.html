@@ -1,0 +1,50 @@
+<div class="ui menu">
+    <div class="header item">
+        Select Month And Year
+    </div>
+    <div class="item">
+        <div class="ui input">
+            <input type="month" name="theMonth" [(ngModel)]="theMonth">
+        </div>
+    </div>
+    <div class="item">
+        <select class="ui selection dropdown " name="selectedAccount" [(ngModel)]="selectedAccount">
+            <option>-- Select Account --</option>
+            <option *ngFor="let account of directory.getAccounts()" [value]="account.id">{{ account.name }}</option>
+        </select>
+    </div>
+    <a class="item" (click)="get()">
+        Get
+    </a>
+</div>
+<div class="ui segment">
+    <table class="ui compact celled table segment">
+        <thead>
+            <tr>
+                <th rowspan="2">Date</th>
+                <th rowspan="2">Opening Balance</th>
+                <th rowspan="2">Total Credit (-)</th>
+                <th rowspan="2">Total Debit (+)</th>
+                <th colspan="2">Closing</th>
+                <th rowspan="2">Difference</th>
+            </tr>
+            <tr>
+                <th>Calculated</th>
+                <th>Actual</th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr *ngFor="let postedOn of objectKeys(data)">
+                <td>{{ postedOn }}</td>
+                <td class="right aligned">{{ data[postedOn].openingBalance | number: '1.2-2'}}</td>
+                <td class="right aligned">{{ data[postedOn].credit | number: '1.2-2'}}</td>
+                <td class="right aligned">{{ data[postedOn].debit | number: '1.2-2'}}</td>
+                <td class="right aligned">{{ data[postedOn].computedCB | number: '1.2-2'}}</td>
+                <td class="right aligned">{{ data[postedOn].actualCB | number: '1.2-2'}}</td>
+                <td class="right aligned">
+                    {{ data[postedOn].actualCB - data[postedOn].computedCB | number:'1.2-2'}}
+                </td>
+            </tr>
+        </tbody>
+    </table>
+</div>

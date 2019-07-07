@@ -3,6 +3,7 @@ import { AppRouterModule } from './../module/app-router/app-router.module';
 import { BrowserModule } from '@angular/platform-browser';
 import { NgModule } from '@angular/core';
 import { FormsModule } from '@angular/forms';
+import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
 
 import { AppComponent } from './app.component';
 import { HttpClientModule } from '@angular/common/http';
@@ -36,6 +37,17 @@ import { AccountCardComponent } from './components/account-card/account-card.com
 import { ReportComponent } from './page/report/report.component';
 import { AbsPipe } from './pipes/abs.pipe';
 import { MyTaskComponent } from './page/my-task/my-task.component';
+import { CombinedCashbookComponent } from './page/combined-cashbook/combined-cashbook.component';
+import { LedgerDateRangeComponent } from './page/ledger-date-range/ledger-date-range.component';
+import { OperatorReportComponent } from './page/operator-report/operator-report.component';
+import { CalendarViewComponent } from './page/calendar-view/calendar-view.component';
+import { TaskEntryFormComponent } from './components/task-entry-form/task-entry-form.component';
+import { WordListComponent } from './page/word-list/word-list.component';
+import { DailyEarningComponent } from './page/daily-earning/daily-earning.component';
+import {NgxMaskModule, IConfig} from 'ngx-mask';
+import { TaskCounterComponent } from './components/task-counter/task-counter.component'
+
+export const options: Partial<IConfig> | (() => Partial<IConfig>) = {};
 
 @NgModule({
   declarations: [
@@ -68,13 +80,23 @@ import { MyTaskComponent } from './page/my-task/my-task.component';
     AccountCardComponent,
     ReportComponent,
     AbsPipe,
-    MyTaskComponent
+    MyTaskComponent,
+    CombinedCashbookComponent,
+    LedgerDateRangeComponent,
+    OperatorReportComponent,
+    CalendarViewComponent,
+    TaskEntryFormComponent,
+    WordListComponent,
+    DailyEarningComponent,
+    TaskCounterComponent
   ],
   imports: [
     BrowserModule,
     HttpClientModule,
     FormsModule,
     AppRouterModule,
+    BrowserAnimationsModule,
+    NgxMaskModule.forRoot(options)
   ],
   providers: [DirectoryService, NotificationService],
   bootstrap: [AppComponent]

@@ -12,6 +12,8 @@ import { Router, NavigationEnd } from '@angular/router';
 export class AppComponent implements OnInit {
   title = 'shopApp';
   users = [];
+  asideLeft = false;
+  asideRight = true;
 
   constructor(
     private mysql: MySQLService,
@@ -26,7 +28,7 @@ export class AppComponent implements OnInit {
           this.router.navigate(['/login']);
         }
       }
-    })
+    });
   }
 
   getUsers() {
@@ -34,4 +36,33 @@ export class AppComponent implements OnInit {
       this.users = response;
     });
   }
+
+  getWidth() {
+    if ( this.asideLeft && this.asideRight ) {
+      return 'ten wide column';
+    } else if ( this.asideLeft || this.asideRight ) {
+      return 'thirteen wide column';
+    } else {
+      return 'sixteen wide column';
+    }
+  }
+
+  columnCount() {
+    if ( this.asideLeft && this.asideRight ) {
+      return 'ui three column divided padded stackable grid';
+    } else if ( this.asideLeft || this.asideRight ) {
+      return 'ui two column divided padded stackable grid';
+    } else {
+      return 'ui one column divided padded stackable grid';
+    }
+  }
+
+  toggleLeftSideBar() {
+    this.asideLeft = !this.asideLeft;
+  }
+
+  toggleRightSideBar() {
+    this.asideRight = !this.asideRight;
+  }
+
 }

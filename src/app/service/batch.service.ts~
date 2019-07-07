@@ -22,7 +22,7 @@ export class BatchService {
       customerName: '',
       insertedBy: 0,
       amountCollected: 0,
-      status: 'INACTIVE',
+      state: 'INACTIVE',
       category_id: 0
     };
   }
@@ -49,7 +49,7 @@ export class BatchService {
    */
   private saveTask(): void {
     delete (this.task.id);
-    if (this.task.status === 'COMPLETED') {
+    if (this.task.state === 'COMPLETED') {
       this.task.acceptedBy = this.task.insertedBy;
       this.task.completedAt = this.toMySqlDateFormat(new Date());
     }
@@ -58,7 +58,7 @@ export class BatchService {
     }, true).subscribe((res: any) => {
       this.task.id = res.lastInsertId;
       const message = `${this.task.customerName}. Inserted successfully`;
-      this.notice.changeMessage({ id: this.task.id, text: message, status: 'green' });
+      this.notice.changeMessage({ id: this.task.id, text: message, state: 'green' });
       this.saveProducts();
       if (this.task.amountCollected > 0) {
         this.saveCashBookEntry(false);
@@ -84,7 +84,7 @@ export class BatchService {
           }).subscribe(() => {
             this.notice.changeMessage({
               text: message,
-              status: 'green'
+              state: 'green'
             });
           });
         }
@@ -145,7 +145,7 @@ export class BatchService {
                 this.notice.changeMessage({
                   // tslint:disable-next-line:max-line-length
                   text: `Cashbook Entry Created ${this.ds.get(item.giver_id).name} => ${this.ds.get(item.receiver_id).name} Rs. ${item.amount}`,
-                  status: 'green'
+                  state: 'green'
                 });
               }
             });

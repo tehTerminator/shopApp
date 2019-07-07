@@ -9,11 +9,11 @@ import { CashTransaction } from './../../interface/cash-transaction';
 })
 export class AccountCardComponent implements OnChanges, OnInit {
     @Input() theName: string;
-    @Input() theDate: Date;
-    @Input() showMeta: boolean = false;
+    @Input() theDate: Date = new Date();
+    showMeta = false;
     accountId: number;
-    given=  0;
-    received= 0;
+    given = 0;
+    received = 0;
     total = 0;
 
     constructor(private db: MySQLService) { }
@@ -23,10 +23,14 @@ export class AccountCardComponent implements OnChanges, OnInit {
         this.total = 0;
     }
 
-    ngOnChanges(changes: SimpleChanges){
-        this.theDate = changes.theDate.currentValue;
-        if( this.accountId > 0 ){
-            this.getOpeningBalance();
+    ngOnChanges(changes: SimpleChanges) {
+        try {
+            this.theDate = changes.theDate.currentValue;
+            if (this.accountId > 0) {
+                this.getOpeningBalance();
+            }
+        } catch (e) {
+            console.log(changes, 'It seems there are not changes');
         }
     }
 
@@ -52,7 +56,8 @@ export class AccountCardComponent implements OnChanges, OnInit {
         const request = {
             andWhere: {
                 andWhere: {
-                    'DATE(postedOn)': this.theDate
+                    'DATE(postedOn)': this.theDate,
+                    state: ['<>', 'REJECTED']
                 },
                 orWhere: {
                     giver_id: this.accountId,
@@ -62,7 +67,7 @@ export class AccountCardComponent implements OnChanges, OnInit {
         };
         this.db.select('cashbook', request).subscribe((res: any) => {
             Array.from(res).forEach((item: CashTransaction) => {
-                if (+item.giver_id == this.accountId) {
+                if (+item.giver_id === +this.accountId) {
                     this.given += +item.amount;
                 } else {
                     this.received += +item.amount;
@@ -71,22 +76,23 @@ export class AccountCardComponent implements OnChanges, OnInit {
             this.total += this.received - this.given;
         });
     }
-    
-    private getOpeningBalance(): void{
+
+    private getOpeningBalance(): void {
         this.db.select('balance', {
-            andWhere :{ account_id : this.accountId, "DATE(postedOn)" : this.theDate }
-        }).subscribe((res: any)=>{
-            if( res.length >= 1 ){
+            andWhere: { account_id: this.accountId, 'DATE(postedOn)': this.theDate }
+        }).subscribe((res: any) => {
+            if (res.length >= 1) {
                 this.total = +res[0].openingBalance;
+                this.showMeta = true;
             } else {
                 this.total = 0;
-            }
-            console.log(this.accountId, this.theName, this.total);
+                this.showMeta = false;
+            }   
             this.getAmount();
-        })
+        });
     }
 
-    private reset(): void{
+    private reset(): void {
         this.given = 0;
         this.received = 0;
     }

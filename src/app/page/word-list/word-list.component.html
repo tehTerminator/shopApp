@@ -1,0 +1,21 @@
+<div class="ui segment">
+  <div class="ui fluid input">
+    <input type="text" name="" placeholder="Enter Word or Words seperated by Space" [(ngModel)]="theWord">
+  </div>
+  <hr>
+  <button class="ui green button" (click)="save()">
+    Save
+  </button>
+</div>
+
+<div class="ui segment">
+  <div class="ui massive fluid icon input">
+    <input type="text" name="searchWord" (input)="onSearchChange($event.target.value)" placeholder="Search Word...">
+    <i class="search icon"></i>
+  </div>
+  <hr>
+  <div class="ui large label" *ngFor="let word of wordList">
+    {{ word }}
+    <i class="close icon" (click)="delete(word)"></i>
+  </div>
+</div>
