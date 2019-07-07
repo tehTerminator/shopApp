@@ -1,0 +1,28 @@
+<div class="ui top attached inverted header">
+  Day Slot View
+</div>
+<div class="ui bottom attached segment">
+  <div class="ui fluid action input">
+    <input type="date" name="theDate" [(ngModel)]="theDate">
+    <button class="ui blue button" (click)="get()">Get</button>
+  </div>
+  <hr>
+  <table class="ui table segment">
+    <thead>
+      <tr>
+        <th>
+          Time Slot
+        </th>
+        <th>
+          Count
+        </th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr *ngFor="let t of slots">
+        <td>{{ t.title }}</td>
+        <td>{{ t.completed }} / {{ t.totalCount }}</td>
+      </tr>
+    </tbody>
+  </table>
+</div>

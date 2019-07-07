@@ -15,7 +15,10 @@ export class BatchService {
   cashTran: Array<CashTransaction> = [];
   private cashbookSaved = false;
   private taskInserted = false;
-  privete; productInserted = false;
+  private productInserted = false;
+  private slotId: number;
+  private slotDate: Date;
+  private slotTitle: string;
 
   constructor(
     private mysql: MySQLService,
@@ -39,21 +42,27 @@ export class BatchService {
     this.productInserted = false;
   }
 
+  public setSlot(id: number, date: Date, title: string): void {
+    this.slotId = id;
+    this.slotDate = date;
+    this.slotTitle = title;
+  }
+
   public save(): void {
     this.equalizeCashBook();
     this.saveTask();
     this.saveProducts();
 
-    if( this.task.category_id === 0 && this.productTran.length === 0 ){
+    if ( this.task.category_id === 0 && this.productTran.length === 0 ) {
       this.saveCashBookEntry(true);
     }
-
   }
 
   /**
    * Saves Task Details
    */
   private saveTask(): void {
+    const customer = this.task.customerName;
     if ( this.task.category_id === 0 ) {
       return;
     }
@@ -73,15 +82,31 @@ export class BatchService {
       return;
     }
 
-    const message = `${this.task.customerName}. Inserted successfully`;
+    console.log(this.task, 'Before Insertion');
+
     this.mysql.insert('task', {
       userData: this.task
     }, true).subscribe((res: any) => {
       this.task.id = res.lastInsertId;
-      this.notice.changeMessage({ id: this.task.id, text: message, state: 'green' });
       this.saveProducts();
       if (this.task.amountCollected > 0) {
         this.saveCashBookEntry(false);
+      }
+      if ( this.task.id > 0 && this.slotId > 0 ) {
+        this.mysql.insert('bookings', {
+          userData: {
+            task_id: this.task.id,
+            slot_Id: this.slotId,
+            forDate: this.slotDate,
+          }
+        }, true).subscribe((res2: any) => {
+          console.log(this.task, 'After Insertion');
+          const message = `Booked ${customer} for ${this.slotDate} ${this.slotTitle}`;
+          this.notice.changeMessage({id: this.task.id, text: message, status: 'green'});
+        });
+      } else {
+        const message = `${customer}. Inserted successfully`;
+        this.notice.changeMessage({ id: this.task.id, text: message, state: 'green' });
       }
     });
     this.taskInserted = true;
@@ -224,8 +249,9 @@ export class BatchService {
   }
 
   private toMySqlDateFormat(theDate: Date): string {
-    // tslint:disable-next-line:max-line-length
-    return `${theDate.getFullYear()}-${this.pad(theDate.getMonth() + 1, 2)}-${this.pad(theDate.getDate(), 2)} ${this.pad(theDate.getHours(), 2)}:${this.pad(theDate.getMinutes(), 2)}:${this.pad(theDate.getSeconds(), 2)}`;
+    let date = `${theDate.getFullYear()}-${this.pad(theDate.getMonth() + 1, 2)}-${this.pad(theDate.getDate(), 2)} `;
+    date += `${this.pad(theDate.getHours(), 2)}:${this.pad(theDate.getMinutes(), 2)}:${this.pad(theDate.getSeconds(), 2)}`;
+    return date;
   }
 
   private pad(num: number, size: number) {

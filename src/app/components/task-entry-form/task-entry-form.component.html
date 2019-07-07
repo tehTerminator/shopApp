@@ -15,15 +15,31 @@
     </div>
     <hr *ngIf="showSuggestion">
     <a class="ui blue label" *ngFor="let name of suggestion" (click)="useSuggestion(name)">
-      {{ name }}
+      {{ name | titlecase }}
     </a>
     <hr *ngIf="showSuggestion">
-    <div class="field">
-      <label for="amountCollected">Amount Collected</label>
-      <div class="ui input">
-        <input type="number" disabled="disabled" name="amountCollected" [(ngModel)]="task.amountCollected" min="0" step="1">
+    
+    
+    <div class="two fields">
+      <div class="field">
+        <label for="slotDate">For Date</label>
+        <input type="date" [(ngModel)]="slotDate">
+      </div>
+      <div class="field">
+        <label for="slotTime">For Time</label>
+        <select name="slotTime" id="" class="ui fluid dropdown" [(ngModel)]="slotId">
+          <option>Select Slot</option>
+          <option class="item" *ngFor="let s of slots" [value]="s.id">{{ s.title }}</option>
+        </select>
       </div>
     </div>
+
+    <div class="field">
+        <label for="amountCollected">Amount Collected</label>
+        <div class="ui input">
+          <input type="number" disabled="disabled" name="amountCollected" [(ngModel)]="task.amountCollected" min="0" step="1">
+        </div>
+      </div>
 
     <div class="field">
       <label for="paymentstate">state</label>

@@ -21,6 +21,9 @@ export class TaskEntryFormComponent implements OnInit {
   showSuggestion = false;
   cashTransactions: Array<CashTransaction> = [];
   productTransactions: Array<ProductTransaction> = [];
+  slots: Array<any> = [];
+  slotDate = new Date();
+  slotId: number;
 
   constructor(
     private db: MySQLService,
@@ -38,12 +41,22 @@ export class TaskEntryFormComponent implements OnInit {
       state: 'INACTIVE',
     };
     // Load Batch Task from Server
-    this.db.select('batch').subscribe((res: any) => {
+    this.db.select('batch', {orderBy: 'title ASC'}).subscribe((res: any) => {
       const allBatch = [];
       Array.from(res).forEach((s: any) => {
         allBatch.push(new Batch(s.id, s.title, s.rate, s.settings));
       });
       this.batch = allBatch.filter((x: Batch) => (x.isPrimarily('task') && x.isFixed()) );
+    });
+
+    // Load Slots
+    this.db.select('slots').subscribe((res: any) => {
+      Array.from(res).forEach((item: any) => {
+        this.slots.push({
+          id: +item.id,
+          title: `${item.startTime} to ${item.endTime}`
+        });
+      });
     });
   }
 
@@ -68,6 +81,7 @@ export class TaskEntryFormComponent implements OnInit {
   }
 
   useSuggestion(theName: string) {
+    theName = theName.toLowerCase().replace(/\b\S/g, t => t.toUpperCase());
     const wordArray = this.task.customerName.split(' ');
     wordArray.pop();
     wordArray.push(theName);
@@ -83,7 +97,7 @@ export class TaskEntryFormComponent implements OnInit {
         userData: {
           theName: item
         }
-      }, true).subscribe((res: any)=>{
+      }, true).subscribe((res: any) => {
         console.log(res.query);
       });
     });
@@ -95,7 +109,9 @@ export class TaskEntryFormComponent implements OnInit {
     });
 
     // Submit Data
+    const slotTitle = this.slots.find( x => +x.id === +this.slotId).title;
     this.bs.set(this.task, this.cashTransactions, this.productTransactions);
+    this.bs.setSlot(this.slotId, this.slotDate, slotTitle);
     this.bs.save();
     this.reset();
   }

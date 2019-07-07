@@ -12,7 +12,7 @@ import { NotificationService } from '../../service/notification.service';
     </div>
     <div class="scrollable">
     <div class="ui segment" *ngFor="let message of messageQueue" [ngClass]="message.state">
-    <div class="ui left ribbon red label" [hidden]="message.id === undefined">{{ message.id }}</div>
+    <div class="ui bottom left attached red label" [hidden]="message.id === undefined">{{ message.id }}</div>
     {{ message.text }}
     <hr>
     <div class="ui bottom right attached mini label">{{ message.timestamp | date:'shortTime' }}</div>
