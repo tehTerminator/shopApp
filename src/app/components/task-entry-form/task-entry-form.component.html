@@ -14,7 +14,7 @@
       </div>
     </div>
     <hr *ngIf="showSuggestion">
-    <a class="ui blue label" *ngFor="let name of suggestion" (click)="useSuggestion(name)">
+    <a class="ui small-margin blue label" *ngFor="let name of suggestion" (click)="useSuggestion(name)">
       {{ name | titlecase }}
     </a>
     <hr *ngIf="showSuggestion">

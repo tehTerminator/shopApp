@@ -10,6 +10,8 @@ import { interval } from 'rxjs';
 export class SlotViewComponent implements OnInit, OnDestroy {
   theDate: Date;
   slots: Array<any> = [];
+  total = 0;
+  completed = 0;
   private timerSubscription: any;
 
   constructor(private db: MySQLService) { }
@@ -43,6 +45,8 @@ export class SlotViewComponent implements OnInit, OnDestroy {
   }
 
   get(): void {
+    this.total = 0;
+    this.completed = 0;
     const request = {
       andWhere: {
         forDate: this.theDate
@@ -60,8 +64,10 @@ export class SlotViewComponent implements OnInit, OnDestroy {
         if ( +item.completed === 1 ) {
           // If True
           selectedSlot.completed += 1;
+          this.completed += 1;
         }
         selectedSlot.totalCount += 1;
+        this.total += 1;
       }
     });
   }

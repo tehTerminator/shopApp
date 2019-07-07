@@ -13,12 +13,12 @@ import { interval } from 'rxjs';
 })
 export class MyTaskComponent implements OnInit, OnDestroy {
   assigned: Array<Task> = [];
-  unassigned: Array<Task> = [];
   theDate: Date = new Date();
   authLevel = 0;
-  searchText = "";
+  searchText = '';
   showAll = false;
   private timerSubscription: any;
+  slotBased = true;
 
 
   constructor(
@@ -30,23 +30,20 @@ export class MyTaskComponent implements OnInit, OnDestroy {
 
   ngOnInit() {
     this.authLevel = +this.users.currentUser.authLevel;
-    this.getAssigned();
-    this.getUnassigned();
+    this.get();
     const timer = interval(1000 * 60);
     this.timerSubscription = timer.subscribe(() => {
-      this.getAssigned();
-      this.getUnassigned();
+      this.get();
     });
   }
 
   ngOnDestroy() {
-    if( this.timerSubscription ){
+    if ( this.timerSubscription ) {
       this.timerSubscription.unsubscribe();
-      console.log('Timer No More');
     }
   }
 
-  getAssigned(): void {
+  get(): void {
     this.assigned = [];
     const request = {
       andWhere: {
@@ -54,70 +51,31 @@ export class MyTaskComponent implements OnInit, OnDestroy {
         acceptedBy: this.users.currentUser.id
       }
     };
-    this.get(request);
+    this.db.select('task', request, true).subscribe((res: any) => {
+      console.log(res);
+      Array.from(res.rows).forEach((item: Task) => {
+        const task = {
+          id: item.id,
+          customerName: item.customerName,
+          category_id: item.category_id,
+          categoryName: this.directory.get(+item.category_id).name,
+          insertedAt: item.insertedAt,
+          insertedBy: item.insertedBy,
+          insertedByUser: this.users.get(+item.insertedBy),
+          acceptedBy: +item.acceptedBy,
+          acceptedByUser: +item.acceptedBy > 0 ? this.users.get(+item.acceptedBy) : undefined,
+          completedAt: item.completedAt,
+          amountCollected: +item.amountCollected,
+          state: item.state,
+          comment: item.comment
+        };
+        this.assigned.push(task);
+      });
+    });
   }
 
   toggleShowAll(): void {
     this.showAll = !this.showAll;
-  }
-
-  getUnassigned(): void {
-    this.unassigned = [];
-    const request = {
-      andWhere: {
-        state: ['NOT IN', 'COMPLETED', 'REJECTED', 'APPROVED'],
-        acceptedBy: 0,
-        'DATE(insertedAt)': this.theDate
-      }
-    };
-
-    if (this.showAll) {
-      delete (request.andWhere['DATE(insertedAt)']);
-    }
-    this.get(request);
-  }
-
-  assignTask(theTask: Task) {
-    const index = this.unassigned.indexOf(theTask);
-
-    if (theTask.state === "UNPAID") {
-      if (confirm("Task is Unpaid, Do You Wish to Mark it Paid ?")) {
-        this.updateCashbook(theTask.id, 'PENDING');
-      } else {
-        return;
-      }
-    }
-
-    if (index >= 0) {
-      theTask.acceptedBy = this.users.currentUser.id;
-      theTask.acceptedByUser = this.users.currentUser;
-      theTask.state = "INACTIVE";
-
-      this.assigned.push(theTask);
-      this.unassigned.splice(index, 1);
-      this.db.update('task', {
-        userData: {
-          acceptedBy: this.users.currentUser.id,
-          state: 'INACTIVE'
-        },
-        andWhere: {
-          id: theTask.id
-        }
-      }, true).subscribe(() => {
-        this.notice.changeMessage({
-          id: theTask.id,
-          text: `Assigned ${theTask.customerName} to ${this.users.currentUser.name}`,
-          state: 'green'
-        });
-        this.searchText = '';
-      });
-    } else {
-      this.notice.changeMessage({
-        id: theTask.id,
-        text: `Something went wrong with task of ${theTask.customerName}`,
-        state: 'red'
-      });
-    }
   }
 
   unselect(theTask: Task) {
@@ -125,8 +83,7 @@ export class MyTaskComponent implements OnInit, OnDestroy {
     if (index >= 0) {
       theTask.acceptedBy = -1;
       theTask.acceptedByUser = undefined;
-      theTask.state = "INACTIVE";
-      this.unassigned.push(theTask);
+      theTask.state = 'INACTIVE';
       this.assigned.splice(index, 1);
       this.db.update('task', {
         userData: {
@@ -142,7 +99,6 @@ export class MyTaskComponent implements OnInit, OnDestroy {
           text: `Unassigned ${theTask.customerName}`,
           state: 'green'
         });
-        this.unassigned.sort((a, b) => { return a.id - b.id });
       });
     } else {
       this.notice.changeMessage({
@@ -155,12 +111,13 @@ export class MyTaskComponent implements OnInit, OnDestroy {
 
   setCompleted(theTask: Task) {
     const index = this.assigned.indexOf(theTask);
+    const taskId = theTask.id;
     if (index >= 0) {
-      theTask.state = "COMPLETED";
+      theTask.state = 'COMPLETED';
       this.db.update('task', {
         userData: {
           acceptedBy: this.users.currentUser.id,
-          state: "COMPLETED",
+          state: 'COMPLETED',
           completedAt: this.getMysqlDate()
         },
         andWhere: {
@@ -174,6 +131,16 @@ export class MyTaskComponent implements OnInit, OnDestroy {
           state: 'green'
         });
         this.updateCashbook(theTask.id, 'COMPLETED');
+      });
+      this.db.update('bookings', {
+        andWhere: {
+          task_id: taskId
+        },
+        userData: {
+          completed: 1
+        }
+      }, true).subscribe((res: any) => {
+        console.log(res);
       });
     } else {
       this.notice.changeMessage({
@@ -190,7 +157,7 @@ export class MyTaskComponent implements OnInit, OnDestroy {
   }
 
   setInactive(theTask: Task) {
-    this.setstate(theTask, 'INACTIVE')
+    this.setstate(theTask, 'INACTIVE');
     theTask.state = 'INACTIVE';
   }
 
@@ -231,34 +198,6 @@ export class MyTaskComponent implements OnInit, OnDestroy {
       }
     }).subscribe(() => {
       theTask.state = thestate;
-    })
-  }
-
-  private get(request: any): void {
-    this.db.select('task', request, true).subscribe((res: any) => {
-      // console.log(res);
-      Array.from(res.rows).forEach((item: Task) => {
-        const task = {
-          id: item.id,
-          customerName: item.customerName,
-          category_id: item.category_id,
-          categoryName: this.directory.get(+item.category_id).name,
-          insertedAt: item.insertedAt,
-          insertedBy: item.insertedBy,
-          insertedByUser: this.users.get(+item.insertedBy),
-          acceptedBy: +item.acceptedBy,
-          acceptedByUser: +item.acceptedBy > 0 ? this.users.get(+item.acceptedBy) : undefined,
-          completedAt: item.completedAt,
-          amountCollected: +item.amountCollected,
-          state: item.state,
-          comment: item.comment
-        };
-        if (task.acceptedBy === 0) {
-          this.unassigned.push(task);
-        } else {
-          this.assigned.push(task);
-        }
-      });
     });
   }
 
@@ -275,24 +214,24 @@ export class MyTaskComponent implements OnInit, OnDestroy {
     if (width > 0) {
       return new Array(width + (/\./.test(n.toString()) ? 2 : 1)).join('0') + n;
     }
-    return n + ""; // always return a string
+    return n + ''; // always return a string
   }
 
-  getColor(theTask: Task): string{
+  getColor(theTask: Task): string {
     const state = theTask.state.toLowerCase();
-    if( state === 'rejected' ){
+    if ( state === 'rejected' ) {
         return 'inverted';
-    } else if( state === 'unpaid' ){
+    } else if ( state === 'unpaid' ) {
         return 'teal';
-    } else if( state === 'inactive' ){
-        if( theTask.acceptedBy > 0 ){
+    } else if ( state === 'inactive' ) {
+        if ( theTask.acceptedBy > 0 ) {
             return 'orange';
         }
-    } else if( state === 'active' ){
+    } else if ( state === 'active' ) {
         return 'red';
-    } else if( state === 'completed' ){
+    } else if ( state === 'completed' ) {
         return 'green';
-    } else if( state === 'blue' ){
+    } else if ( state === 'blue' ) {
         return 'blue';
     } else {
         return '';

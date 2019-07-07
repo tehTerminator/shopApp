@@ -1,53 +1,24 @@
 <div class="ui two column grid">
-  <div class="six wide column">
-    <div class="ui fluid top attached menu">
-      <a class="header item" (click)="toggleShowAll();getUnassigned()">
-        {{ showAll ? 'Show All' : 'By Date' }}
-      </a>
-      <div class="item">
-        <div class="ui transparent icon input">
-          <input type="date" [(ngModel)]="theDate" (change)="getUnassigned()" [disabled]="showAll">
-          <i class="calendar icon"></i>
-        </div>
-      </div>
-    </div>
-    <div class="ui attached fluid vertical compact menu">
-      <div class="item">
-        <div class="ui icon input">
-          <input type="text" name="searchText" [(ngModel)]="searchText" placeholder="Search Text">
-          <i class="search icon"></i>
-        </div>
-      </div>
-    </div>
-    <div class="ui buttom attached scrollable segment">
-      <div class="ui divided list">
-        <a class="item" (click)="assignTask(task)" *ngFor="let task of unassigned|search:'id,customerName':searchText">
-          <div class="right floated content">
-            <div class="ui label" [ngClass]="getColor(task)">
-              {{ task.id }}
-            </div>
-          </div>
-          <div class="content">
-            <div class="header">{{ task.customerName }}</div>
-            <div class="descriptiplion">
-              {{ task.insertedAt | date:'shortTime' }}
-            </div>
-          </div>
-        </a>
-      </div>
-    </div>
+  <div class="four wide column">
+    <app-assign-task></app-assign-task>
   </div>
 
-  <div class="ten wide column">
+  <div class="twelve wide column">
     <div class="ui scrollable segment">
+      <button class="ui right floated blue icon button" (click)='get()'>
+        <i class="refresh icon"></i>
+      </button>
       <div class="ui three cards">
         <div class="raised card" *ngFor="let task of assigned">
+          <div class="ui top attached inverted header">
+            {{ task.customerName }}
+            <div class="ui right floated red label">{{ task.id }}</div>
+          </div>
           <div class="content">
             <img class="ui right floated mini image">
-            <div class="header">{{ task.customerName }}</div>
             <div class="meta">{{ task.insertedAt | date:'dd-MMM hh:mm a' }}</div>
             <div class="description">
-              Paid {{ task.amountCollected }} {{ task.comment }}. Task Inserted By {{ task.insertedByUser.name }}
+              Paid {{ task.amountCollected }} for {{ task.categoryName }} {{ task.comment }}. Task Inserted By {{ task.insertedByUser.name }}
             </div>
           </div>
   
