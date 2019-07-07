@@ -200,7 +200,7 @@ export class MyTaskComponent implements OnInit, OnDestroy {
             id: res2.lastInsertId,
             text: message,
             state: 'green'
-          })
+          });
         });
       });
     });
