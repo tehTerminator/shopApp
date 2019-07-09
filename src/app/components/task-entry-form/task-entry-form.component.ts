@@ -89,7 +89,7 @@ export class TaskEntryFormComponent implements OnInit {
     this.nameField.nativeElement.focus();
   }
 
-  save() {
+  save(bookSlot: boolean) {
     // Update Word Dictionary
     const wordArray = this.task.customerName.split(' ');
     wordArray.forEach((item: string) => {
@@ -109,9 +109,16 @@ export class TaskEntryFormComponent implements OnInit {
     });
 
     // Submit Data
-    const slotTitle = this.slots.find( x => +x.id === +this.slotId).title;
     this.bs.set(this.task, this.cashTransactions, this.productTransactions);
-    this.bs.setSlot(this.slotId, this.slotDate, slotTitle);
+    if ( bookSlot ) {
+      try {
+        const slotTitle = this.slots.find( x => +x.id === +this.slotId).title;
+        this.bs.setSlot(this.slotId, this.slotDate, slotTitle);
+      } catch (e) {
+        alert('Invalid Date or Time For Booking');
+        return;
+      }
+    }
     this.bs.save();
     this.reset();
   }

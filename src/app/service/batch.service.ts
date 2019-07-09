@@ -16,6 +16,7 @@ export class BatchService {
   private cashbookSaved = false;
   private taskInserted = false;
   private productInserted = false;
+  private slotsSaved = true;
   private slotId: number;
   private slotDate: Date;
   private slotTitle: string;
@@ -99,11 +100,11 @@ export class BatchService {
             slot_Id: this.slotId,
             forDate: this.slotDate,
           }
-        }, true).subscribe((res2: any) => {
-          console.log(this.task, 'After Insertion');
+        }).subscribe(() => {
           const message = `Booked ${customer} for ${this.slotDate} ${this.slotTitle}`;
           this.notice.changeMessage({id: this.task.id, text: message, status: 'green'});
         });
+        this.slotId = -1;
       } else {
         const message = `${customer}. Inserted successfully`;
         this.notice.changeMessage({ id: this.task.id, text: message, state: 'green' });

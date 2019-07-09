@@ -49,7 +49,7 @@ export class SlotViewComponent implements OnInit, OnDestroy {
     this.completed = 0;
     const request = {
       andWhere: {
-        forDate: this.theDate
+        'DATE(forDate)': this.theDate
       }
     };
 
@@ -58,8 +58,9 @@ export class SlotViewComponent implements OnInit, OnDestroy {
       iterator.completed = 0;
     }
 
-    this.db.select('bookings', request).subscribe((res: any) => {
-      for (const item of res) {
+    this.db.select('bookings', request, true).subscribe((res: any) => {
+      console.log(res);
+      for (const item of res.rows) {
         const selectedSlot = this.slots.find(x => +x.id === +item.slot_id);
         if ( +item.completed === 1 ) {
           // If True

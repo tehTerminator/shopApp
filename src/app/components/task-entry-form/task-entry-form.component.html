@@ -34,7 +34,7 @@
       </div>
     </div>
 
-    <div class="field">
+    <!-- <div class="field">
         <label for="amountCollected">Amount Collected</label>
         <div class="ui input">
           <input type="number" disabled="disabled" name="amountCollected" [(ngModel)]="task.amountCollected" min="0" step="1">
@@ -48,9 +48,12 @@
         <option value="UNPAID">UNPAID</option>
         <option value="COMPLETED">COMPLETED</option>
       </select>
-    </div>
-  <button class="ui green button" [hidden]="task.customerName.length <= 2" (click)="save()">
+    </div> -->
+  <button class="ui green button" [hidden]="task.customerName.length <= 2" (click)="save(false)">
     Save
+  </button>
+  <button class="ui green button" [hidden]="task.customerName.length <= 2" (click)="save(true)">
+    Save &amp; Book Slot
   </button>
   <button class="ui red button" (click)="reset()">
     Reset

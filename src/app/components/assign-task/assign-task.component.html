@@ -23,7 +23,7 @@
       state : <strong> {{ task.state }}</strong>
     </div>
     <div class="item" [hidden]="task.comment === null || task.comment.length === 0">
-      Description: <strong>{{ task.comment }}</strong>
+      Description: <strong>{{ task.comment }}</strong>{{ description }}
     </div>
   </div>
   <hr>

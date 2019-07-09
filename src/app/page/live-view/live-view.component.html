@@ -1,5 +1,5 @@
 <div class="ui three column grid">
-	<div class="four wide column">
+	<div class="six wide column">
 		<app-task-entry-form></app-task-entry-form>
 		<hr>
 		<app-assign-task></app-assign-task>
@@ -20,7 +20,13 @@
 	<div class="four wide column">
 		<!-- Filter Form :: Start ::-->
 		<div class="ui stackable form segment">
-			<div class="two fields">
+			<div class="field">
+				<label for="theDate">Date</label>
+				<div class="ui fluid labeled input">
+					<input type="date" name="theDate" [(ngModel)]="theDate" (change)="get()">
+				</div>
+			</div>
+			<!-- <div class="two fields">
 				<div class="field">
 					<label for="theDate">Date</label>
 					<div class="ui fluid labeled input">
@@ -34,7 +40,7 @@
 						<i class="search icon"></i>
 					</div>
 				</div>
-			</div>
+			</div> -->
 			<div class="two fields">
 				<div class="field">
 					<label for="selectedCategory">Filter Category</label>
@@ -64,10 +70,15 @@
 		</div>
 		<!-- Filter Form :: END :: -->
 		<app-slot-view></app-slot-view>
-		
+
 	</div>
-	<div class="eight wide column">
+	<div class="six wide column">
 		<div class="ui scrollable segment">
+			<div class="ui fluid icon input">
+				<input type="text" placeholder="Search..." name="searchText" [(ngModel)]="searchText">
+				<i class="search icon"></i>
+			</div>
+			<hr>
 			<div class="ui divided ordered list">
 				<div class="item" *ngFor="let task of tasks|search:'id,customerName':searchText">
 					<div class="right floated content">

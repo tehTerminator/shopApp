@@ -32,7 +32,7 @@ export class NewDataFormComponent implements OnInit {
 
     ngOnInit() {
         // Load Services
-        this.mysql.select('batch').subscribe((res: any) => {
+        this.mysql.select('batch', {orderBy: 'title ASC'}).subscribe((res: any) => {
             Array.from(res).forEach((s: any) => {
                 this.batch.push(new Batch(s.id, s.title, s.rate, s.settings));
             });

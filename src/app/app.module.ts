@@ -46,7 +46,8 @@ import { WordListComponent } from './page/word-list/word-list.component';
 import { DailyEarningComponent } from './page/daily-earning/daily-earning.component';
 import {NgxMaskModule, IConfig} from 'ngx-mask';
 import { TaskCounterComponent } from './components/task-counter/task-counter.component';
-import { SlotViewComponent } from './components/slot-view/slot-view.component'
+import { SlotViewComponent } from './components/slot-view/slot-view.component';
+import { SearchTaskByNameComponent } from './components/search-task-by-name/search-task-by-name.component'
 
 export const options: Partial<IConfig> | (() => Partial<IConfig>) = {};
 
@@ -90,7 +91,8 @@ export const options: Partial<IConfig> | (() => Partial<IConfig>) = {};
     WordListComponent,
     DailyEarningComponent,
     TaskCounterComponent,
-    SlotViewComponent
+    SlotViewComponent,
+    SearchTaskByNameComponent
   ],
   imports: [
     BrowserModule,
