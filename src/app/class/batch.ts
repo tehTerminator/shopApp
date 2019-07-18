@@ -107,4 +107,14 @@ export class Batch {
     isPrimarily(theType: string): boolean {
         return this.getType() === theType;
     }
+
+    hasCategory(categoryId: number): boolean {
+        const taskSettings = this.getTaskSettings();
+        for (const iterator of taskSettings) {
+            if ( +iterator.categoryId === categoryId ) {
+                return true;
+            }
+        }
+        return false;
+    }
 }
