@@ -1,12 +1,15 @@
   <div class="ui form segment">
     <div class="field">
-      <label for="batch">Select Type</label>
-      <select class="ui fluid selection dropdown" name="selectedBatch" (change)="extractDetails()" [(ngModel)]="selectedBatch">
-        <option *ngFor="let b of batch" [value]="b.id">
-          {{ b.title }} - {{ b.rate }}
-        </option>
-      </select>
-    </div>
+        <label for="slotDate">For Date</label>
+        <input type="date" [(ngModel)]="slotDate">
+      </div>
+      <div class="field">
+        <label for="category">Category</label>
+        <select name="category" class="ui fluid selection dropdown" [(ngModel)]="categoryId" (change)="loadBatch()">
+          <option *ngFor="let d of ds.getCategories()" [value]="d.id">{{ d.name }}</option>
+        </select>
+      </div>
+      
     <div class="field">
       <label for="customerName">Customer Name</label>
       <div class="ui input">
@@ -18,11 +21,17 @@
       {{ name | titlecase }}
     </a>
     <hr *ngIf="showSuggestion">
-    <div class="two fields">
-      <div class="field">
-        <label for="slotDate">For Date</label>
-        <input type="date" [(ngModel)]="slotDate">
-      </div>
+    <!-- <div class="two fields"> -->
+
+        <div class="field">
+            <label for="batch">Select Type</label>
+            <select class="ui fluid selection dropdown" name="selectedBatch" (change)="extractDetails()" [(ngModel)]="selectedBatch">
+              <option *ngFor="let b of batch" [value]="b.id">
+                {{ b.title }} - {{ b.rate }}
+              </option>
+            </select>
+          </div>
+      
       <div class="field">
         <label for="slotTime">For Time</label>
         <select name="slotTime" id="" class="ui fluid dropdown" [(ngModel)]="slotId">
@@ -30,7 +39,7 @@
           <option class="item" *ngFor="let s of slots" [value]="s.id">{{ s.title }}</option>
         </select>
       </div>
-    </div>
+    <!-- </div> -->
 
     <!-- <div class="field">
         <label for="amountCollected">Amount Collected</label>
@@ -47,6 +56,8 @@
         <option value="COMPLETED">COMPLETED</option>
       </select>
     </div> -->
+
+    
   <button class="ui green button" [hidden]="task.customerName.length <= 2" (click)="save(false)">
     Save
   </button>

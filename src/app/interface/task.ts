@@ -15,4 +15,5 @@ export interface Task {
     comment?: string;
     match?: boolean;
     forDate?: string;
+    slotTitle?: string;
 }

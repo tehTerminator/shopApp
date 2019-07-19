@@ -21,6 +21,7 @@ export class LiveViewComponent implements OnInit, OnDestroy {
   searchText: string;
   selectedState: string;
   slotBased = true;
+  slots: Array<any> = [];
 
 
   constructor(
@@ -34,6 +35,14 @@ export class LiveViewComponent implements OnInit, OnDestroy {
     const timer = interval(1000 * 60);
     this.timerSubscription = timer.subscribe(() => {
       this.get();
+    });
+    this.mysql.select('slots').subscribe((res: any) => {
+      res.forEach((item: any) => {
+        this.slots.push({
+          id: +item.id,
+          title: `${item.startTime} - ${item.endTime}`
+        });
+      });
     });
   }
 
@@ -52,6 +61,7 @@ export class LiveViewComponent implements OnInit, OnDestroy {
       request = {
         columns: ['bookings.task_id AS id',
           'bookings.forDate as forDate',
+          'bookings.slot_Id as slotId',
           'task.customerName',
           'task.insertedAt',
           'task.acceptedBy',
@@ -142,6 +152,11 @@ export class LiveViewComponent implements OnInit, OnDestroy {
     } else {
       task.acceptedByUser = new User(0, '', 0);
     }
+
+    if ( this.slotBased ) {
+      task.slotTitle = this.slots.find(x => x.id = item.slotId).title;
+    }
+
     this.tasks.push(task);
   }
 

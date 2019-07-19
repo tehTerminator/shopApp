@@ -111,7 +111,8 @@ export class Batch {
     hasCategory(categoryId: number): boolean {
         const taskSettings = this.getTaskSettings();
         for (const iterator of taskSettings) {
-            if ( +iterator.categoryId === categoryId ) {
+            if ( +iterator.category_id === +categoryId ) {
+                console.log('Category Found', categoryId);
                 return true;
             }
         }

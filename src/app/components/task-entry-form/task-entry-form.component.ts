@@ -6,6 +6,7 @@ import { Task } from '../../interface/task';
 import { BatchService } from '../../service/batch.service';
 import { CashTransaction } from '../../interface/cash-transaction';
 import { ProductTransaction } from '../../interface/product-transaction';
+import { DirectoryService } from '../../service/directory.service';
 
 @Component({
   selector: 'app-task-entry-form',
@@ -24,11 +25,13 @@ export class TaskEntryFormComponent implements OnInit {
   slots: Array<any> = [];
   slotDate = new Date();
   slotId: number;
+  categoryId: number;
 
   constructor(
     private db: MySQLService,
     private us: UserService,
     private bs: BatchService,
+    public ds: DirectoryService
   ) { }
 
   ngOnInit() {
@@ -40,14 +43,7 @@ export class TaskEntryFormComponent implements OnInit {
       amountCollected: 0,
       state: 'INACTIVE',
     };
-    // Load Batch Task from Server
-    this.db.select('batch', {orderBy: 'title ASC'}).subscribe((res: any) => {
-      const allBatch = [];
-      Array.from(res).forEach((s: any) => {
-        allBatch.push(new Batch(s.id, s.title, s.rate, s.settings));
-      });
-      this.batch = allBatch.filter((x: Batch) => (x.isPrimarily('task') && x.isFixed()) );
-    });
+
 
     // Load Slots
     this.db.select('slots').subscribe((res: any) => {
@@ -58,6 +54,19 @@ export class TaskEntryFormComponent implements OnInit {
         });
       });
     });
+  }
+
+  loadBatch(): void {
+        // Load Batch Task from Server
+        console.log('Load Batch Called')
+        this.db.select('batch', {orderBy: 'title ASC'}).subscribe((res: any) => {
+          const allBatch = [];
+          Array.from(res).forEach((s: any) => {
+            allBatch.push(new Batch(s.id, s.title, s.rate, s.settings));
+          });
+          console.table(allBatch);
+          this.batch = allBatch.filter((x: Batch) => x.hasCategory(+this.categoryId));
+        });
   }
 
   onSearchChange(searchValue: string) {

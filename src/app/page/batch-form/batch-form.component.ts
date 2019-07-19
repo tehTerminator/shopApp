@@ -2,6 +2,7 @@ import { NotificationService } from '../../service/notification.service';
 import { MySQLService } from '../../service/my-sql.service';
 import { Batch } from '../../class/batch';
 import { Component, OnInit } from '@angular/core';
+import { DirectoryService } from '../../service/directory.service';
 
 @Component({
   selector: 'app-batch-form',
@@ -13,7 +14,11 @@ export class BatchFormComponent implements OnInit {
   theBatch: Batch;
   selectedSetting = 'product';
   settingsForm = {};
-  constructor(private mysql: MySQLService, private notificationService: NotificationService) { }
+  constructor(
+    private mysql: MySQLService,
+    private notificationService: NotificationService,
+    public directory: DirectoryService
+  ) { }
 
   ngOnInit() {
     this.theBatch = new Batch(0, '', 0, []);

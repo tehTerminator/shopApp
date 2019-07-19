@@ -94,6 +94,9 @@
 							{{ task.insertedAt | date: 'shortTime'}}
 						</div>
 						<div class="ui basic blue label">{{ task.categoryName }}</div>
+						<div class="ui basic blue label" *ngIf="task.slotTitle">
+							{{ task.slotTitle }}
+						</div>
 					</div>
 				</div>
 			</div>

@@ -46,7 +46,11 @@
           <tbody>
             <tr *ngFor="let obj of objectKeys(setting)">
               <td>{{ obj }}</td>
-              <td>{{ setting[obj] }}</td>
+              <td>{{ setting[obj] }}
+                <span *ngIf="obj.indexOf('id') >= 0">
+                  ({{ directory.get(setting[obj]).name }})
+                </span>
+              </td>
             </tr>
           </tbody>
           <tfoot>

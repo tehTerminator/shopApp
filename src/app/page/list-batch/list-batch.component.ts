@@ -1,6 +1,7 @@
 import { Batch } from './../../class/batch';
 import { MySQLService } from '../../service/my-sql.service';
 import { Component, OnInit } from '@angular/core';
+import { DirectoryService } from '../../service/directory.service';
 
 @Component({
   selector: 'app-list-batch',
@@ -9,7 +10,7 @@ import { Component, OnInit } from '@angular/core';
 export class ListBatchComponent implements OnInit {
   batch = [];
   selectedBatch: Batch;
-  constructor(private mysql: MySQLService) { }
+  constructor(private mysql: MySQLService, public directory: DirectoryService) { }
 
   ngOnInit() {
     this.fetchData();
