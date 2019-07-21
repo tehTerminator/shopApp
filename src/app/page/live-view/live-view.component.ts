@@ -154,10 +154,17 @@ export class LiveViewComponent implements OnInit, OnDestroy {
     }
 
     if ( this.slotBased ) {
-      task.slotTitle = this.slots.find(x => x.id = item.slotId).title;
+      task.slotTitle = this.slots.find(x => +x.id === +item.slotId).title;
     }
 
     this.tasks.push(task);
+    this.tasks.sort((a: Task, b: Task) => {
+      if ( a.slotTitle !== undefined ) {
+        return (+a.slotTitle.split(':').join('').substr(0, 6) + a.id) - (+b.slotTitle.split(':').join('').substr(0, 6) + b.id);
+      } else {
+        return (a.id - b.id);
+      }
+    });
   }
 
   toggleRequest() {
