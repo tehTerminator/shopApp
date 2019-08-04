@@ -57,16 +57,16 @@ export class TaskEntryFormComponent implements OnInit {
   }
 
   loadBatch(): void {
-        // Load Batch Task from Server
-        console.log('Load Batch Called')
-        this.db.select('batch', {orderBy: 'title ASC'}).subscribe((res: any) => {
-          const allBatch = [];
-          Array.from(res).forEach((s: any) => {
-            allBatch.push(new Batch(s.id, s.title, s.rate, s.settings));
-          });
-          console.table(allBatch);
-          this.batch = allBatch.filter((x: Batch) => x.hasCategory(+this.categoryId));
-        });
+    // Load Batch Task from Server
+    console.log('Load Batch Called')
+    this.db.select('batch', { orderBy: 'title ASC' }).subscribe((res: any) => {
+      const allBatch = [];
+      Array.from(res).forEach((s: any) => {
+        allBatch.push(new Batch(s.id, s.title, s.rate, s.settings));
+      });
+      console.table(allBatch);
+      this.batch = allBatch.filter((x: Batch) => x.hasCategory(+this.categoryId));
+    });
   }
 
   onSearchChange(searchValue: string) {
@@ -77,10 +77,10 @@ export class TaskEntryFormComponent implements OnInit {
           theName: ['LIKE', word]
         },
         limit: 3
-      }, true).subscribe((res: any) => {
+      }).subscribe((res: any) => {
         this.suggestion = [];
         console.log(res);
-        res.rows.forEach((item: any) => {
+        res.forEach((item: any) => {
           this.suggestion.push(item.theName);
         });
         this.showSuggestion = this.suggestion.length > 0;
@@ -98,9 +98,11 @@ export class TaskEntryFormComponent implements OnInit {
     wordArray.push(theName);
     this.task.customerName = wordArray.join(' ');
     this.nameField.nativeElement.focus();
+    this.task.customerName = this.toTitleCase(this.task.customerName);
   }
 
   save(bookSlot: boolean) {
+
     // Update Word Dictionary
     const wordArray = this.task.customerName.split(' ');
     wordArray.forEach((item: string) => {
@@ -114,16 +116,16 @@ export class TaskEntryFormComponent implements OnInit {
     });
 
     // Update Description of Cashbook Entries
-    const jobType = this.batch.find(x => +x.id === +this.selectedBatch ).title;
+    const jobType = this.batch.find(x => +x.id === +this.selectedBatch).title;
     this.cashTransactions.forEach((item: CashTransaction) => {
       item.description = `${this.task.customerName} - ${jobType}`;
     });
 
     // Submit Data
     this.bs.set(this.task, this.cashTransactions, this.productTransactions);
-    if ( bookSlot ) {
+    if (bookSlot) {
       try {
-        const slotTitle = this.slots.find( x => +x.id === +this.slotId).title;
+        const slotTitle = this.slots.find(x => +x.id === +this.slotId).title;
         this.bs.setSlot(this.slotId, this.slotDate, slotTitle);
       } catch (e) {
         alert('Invalid Date or Time For Booking');
@@ -170,5 +172,14 @@ export class TaskEntryFormComponent implements OnInit {
     this.task.customerName = '';
     this.task.state = 'INACTIVE';
     this.nameField.nativeElement.focus();
+  }
+
+  toTitleCase(str: string): string {
+    return str.replace(
+      /\w\S*/g,
+      function (txt) {
+        return txt.charAt(0).toUpperCase() + txt.substr(1).toLowerCase();
+      }
+    );
   }
 }

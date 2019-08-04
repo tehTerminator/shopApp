@@ -20,58 +20,47 @@ import { OperatorReportComponent } from './../../app/page/operator-report/operat
 import { CalendarViewComponent } from '../../app/page/calendar-view/calendar-view.component';
 import { WordListComponent } from '../../app/page/word-list/word-list.component';
 import { DailyEarningComponent } from '../../app/page/daily-earning/daily-earning.component';
+import { TaskReportComponent } from './../../app/page/task-report/task-report.component';
 
 const routes: Routes = [
   {
-    path: 'home', component: HomeComponent
-  },
-  {
-    path: 'admin/directory', component: DirectoryComponent
-  },
-  {
-    path: 'cashbook/view', component: AccountDetailsComponent
-  },
-  {
-    path: 'admin', component: AdminComponent
-  },
-  {
-    path: 'task/liveView', component: LiveViewComponent
-  },
-  {
     path: '', redirectTo: '/login', pathMatch: 'full'
+  },
+  {
+    path: 'home', component: HomeComponent
   },
   {
     path: 'login', component: LoginComponent
   },
   {
-    path: 'admin/batch/list', component: ListBatchComponent
+    path: 'task', component: TaskComponent
   },
   {
     path: 'task/create', component: CreateTaskComponent
   },
   {
-    path: 'cashbook', component: CashBookComponent
-  },
-  {
-    path: 'task', component: TaskComponent
-  },
-  {
-    path: 'admin/batch/create', component: BatchFormComponent
-  },
-  {
-    path: 'cashbook/balance', component: AccountBalanceComponent
-  },
-  {
-    path: 'report/day', component: DayReportComponent
-  },
-  {
-    path: 'report', component: ReportComponent
+    path: 'task/liveView', component: LiveViewComponent
   },
   {
     path: 'task/myTask', component: MyTaskComponent
   },
   {
+    path: 'cashbook', component: CashBookComponent
+  },
+  {
     path: 'cashbook/combined', component: CombinedCashbookComponent
+  },
+  {
+    path: 'cashbook/balance', component: AccountBalanceComponent
+  },
+  {
+    path: 'cashbook/view', component: AccountDetailsComponent
+  },
+  {
+    path: 'report', component: ReportComponent
+  },
+  {
+    path: 'report/day', component: DayReportComponent
   },
   {
     path: 'report/operator', component: OperatorReportComponent
@@ -80,12 +69,26 @@ const routes: Routes = [
     path: 'report/acMonthly', component: CalendarViewComponent
   },
   {
+    path: 'report/dailyEarning', component: DailyEarningComponent
+  },
+  {
+    path: 'report/task', component: TaskReportComponent
+  },
+  {
+    path: 'admin', component: AdminComponent
+  },
+  {
+    path: 'admin/directory', component: DirectoryComponent
+  },
+  {
+    path: 'admin/batch/create', component: BatchFormComponent
+  },
+  {
     path: 'admin/dictionary', component: WordListComponent
   },
   {
-    path: 'report/dailyEarning', component: DailyEarningComponent
+    path: 'admin/batch/list', component: ListBatchComponent
   }
-
 ];
 
 @NgModule({
