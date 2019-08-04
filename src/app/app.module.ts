@@ -47,7 +47,9 @@ import { DailyEarningComponent } from './page/daily-earning/daily-earning.compon
 import {NgxMaskModule, IConfig} from 'ngx-mask';
 import { TaskCounterComponent } from './components/task-counter/task-counter.component';
 import { SlotViewComponent } from './components/slot-view/slot-view.component';
-import { SearchTaskByNameComponent } from './components/search-task-by-name/search-task-by-name.component'
+import { SearchTaskByNameComponent } from './components/search-task-by-name/search-task-by-name.component';
+import { ManageTaskComponent } from './page/manage-task/manage-task.component';
+import { TaskReportComponent } from './page/task-report/task-report.component'
 
 export const options: Partial<IConfig> | (() => Partial<IConfig>) = {};
 
@@ -92,7 +94,9 @@ export const options: Partial<IConfig> | (() => Partial<IConfig>) = {};
     DailyEarningComponent,
     TaskCounterComponent,
     SlotViewComponent,
-    SearchTaskByNameComponent
+    SearchTaskByNameComponent,
+    ManageTaskComponent,
+    TaskReportComponent
   ],
   imports: [
     BrowserModule,
