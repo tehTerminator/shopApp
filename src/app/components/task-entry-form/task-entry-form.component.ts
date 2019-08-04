@@ -14,7 +14,7 @@ import { DirectoryService } from '../../service/directory.service';
   styleUrls: ['./task-entry-form.component.css']
 })
 export class TaskEntryFormComponent implements OnInit {
-  @ViewChild('name') nameField: ElementRef;
+  @ViewChild('name', { static: true }) nameField: ElementRef;
   selectedBatch = 0;
   batch: Array<Batch> = [];
   suggestion: Array<string> = [];
