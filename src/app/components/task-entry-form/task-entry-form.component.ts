@@ -69,7 +69,7 @@ export class TaskEntryFormComponent implements OnInit {
     });
   }
 
-  onSearchChange(searchValue: string) {
+  onSearchChange() {
     const word = this.task.customerName.split(' ').pop() + '%';
     if (word.length >= 3) {
       this.db.select('suggestion', {
@@ -79,7 +79,6 @@ export class TaskEntryFormComponent implements OnInit {
         limit: 3
       }).subscribe((res: any) => {
         this.suggestion = [];
-        console.log(res);
         res.forEach((item: any) => {
           this.suggestion.push(item.theName);
         });
@@ -99,6 +98,8 @@ export class TaskEntryFormComponent implements OnInit {
     this.task.customerName = wordArray.join(' ');
     this.nameField.nativeElement.focus();
     this.task.customerName = this.toTitleCase(this.task.customerName);
+    this.showSuggestion = false;
+    this.suggestion = [];
   }
 
   save(bookSlot: boolean) {

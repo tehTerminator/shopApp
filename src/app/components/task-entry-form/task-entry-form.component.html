@@ -1,71 +1,59 @@
-<div class="ui form segment">
-  <div class="field">
-    <label for="slotDate">For Date</label>
-    <input type="date" [(ngModel)]="slotDate">
+<div class="ui inverted form segment">
+  <div class="ui header">
+    <i class="wrench icon"></i>Create Task
   </div>
-  <div class="field">
-    <label for="category">Category</label>
-    <select name="category" class="ui fluid dropdown" [(ngModel)]="categoryId" (change)="loadBatch()">
-      <option *ngFor="let d of ds.getCategories()" [value]="d.id">{{ d.name }}</option>
-    </select>
+  <div class="two fields">
+    <div class="field">
+      <label for="category">Category</label>
+      <select name="category" class="ui fluid dropdown" [(ngModel)]="categoryId" (change)="loadBatch()">
+        <option *ngFor="let d of ds.getCategories()" [value]="d.id">{{ d.name }}</option>
+      </select>
+    </div>
+    <div class="field">
+      <label for="slotDate">For Date</label>
+      <input type="date" [(ngModel)]="slotDate">
+    </div>
   </div>
 
   <div class="field">
     <label for="customerName">Customer Name</label>
     <div class="ui input">
       <input type="text" #name name="customerName" [(ngModel)]="task.customerName"
-        (input)="onSearchChange($event.target.value)" (keydown.enter)="useSuggestion(suggestion[0])">
-    </div>
+        (input)="onSearchChange()" (keydown.enter)="useSuggestion(suggestion[0])">
+    </div> 
   </div>
-  <hr *ngIf="showSuggestion">
   <a class="ui small-margin blue label" *ngFor="let name of suggestion" (click)="useSuggestion(name)">
     {{ name | titlecase }}
   </a>
-  <hr *ngIf="showSuggestion">
   <!-- <div class="two fields"> -->
 
-  <div class="field">
-    <label for="batch">Select Type</label>
-    <select class="ui fluid dropdown" name="selectedBatch" (change)="extractDetails()" [(ngModel)]="selectedBatch">
-      <option *ngFor="let b of batch" [value]="b.id">
-        {{ b.title }} - {{ b.rate }}
-      </option>
-    </select>
-  </div>
-
-  <div class="field">
-    <label for="slotTime">For Time</label>
-    <select name="slotTime" id="" class="ui fluid dropdown" [(ngModel)]="slotId">
-      <option>Select Slot</option>
-      <option class="item" *ngFor="let s of slots" [value]="s.id">{{ s.title }}</option>
-    </select>
+  <div class="two fields">
+    <div class="field">
+      <label for="batch">Select Type</label>
+      <select class="ui fluid dropdown" name="selectedBatch" (change)="extractDetails()" [(ngModel)]="selectedBatch">
+        <option *ngFor="let b of batch" [value]="b.id">
+          {{ b.title }} - {{ b.rate }}
+        </option>
+      </select>
+    </div>
+  
+    <div class="field">
+      <label for="slotTime">For Time</label>
+      <select name="slotTime" id="" class="ui fluid dropdown" [(ngModel)]="slotId">
+        <option>Select Slot</option>
+        <option class="item" *ngFor="let s of slots" [value]="s.id">{{ s.title }}</option>
+      </select>
+    </div>
   </div>
   <!-- </div> -->
 
-  <!-- <div class="field">
-        <label for="amountCollected">Amount Collected</label>
-        <div class="ui input">
-          <input type="number" disabled="disabled" name="amountCollected" [(ngModel)]="task.amountCollected" min="0" step="1">
-        </div>
-      </div>
-
-    <div class="field">
-      <label for="paymentstate">state</label>
-      <select name="state" [(ngModel)]="task.state">
-        <option value="INACTIVE" selected="selected">INACTIVE</option>
-        <option value="UNPAID">UNPAID</option>
-        <option value="COMPLETED">COMPLETED</option>
-      </select>
-    </div> -->
-
-
-  <button class="ui green button" [hidden]="task.customerName.length <= 2" (click)="save(false)">
+  <button class="ui inverted basic green button" [hidden]="task.customerName.length <= 2" (click)="save(false)">
     Save
   </button>
-  <button class="ui green button" [hidden]="task.customerName.length <= 2" (click)="save(true)">
+  <button class="ui inverted basic green button" [hidden]="task.customerName.length <= 2" (click)="save(true)">
     Save &amp; Book Slot
   </button>
-  <button class="ui red button" (click)="reset()">
+  <button class="ui inverted basic red button" (click)="reset()">
     Reset
   </button>
 </div>

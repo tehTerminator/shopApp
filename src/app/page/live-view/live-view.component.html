@@ -73,12 +73,11 @@
 
 	</div>
 	<div class="six wide column">
+		<div class="ui fluid icon input">
+			<input type="text" placeholder="Search..." name="searchText" [(ngModel)]="searchText">
+			<i class="search icon"></i>
+		</div>
 		<div class="ui scrollable segment">
-			<div class="ui fluid icon input">
-				<input type="text" placeholder="Search..." name="searchText" [(ngModel)]="searchText">
-				<i class="search icon"></i>
-			</div>
-			<hr>
 			<div class="ui divided ordered list">
 				<div class="item" *ngFor="let task of tasks|search:'id,customerName':searchText">
 					<div class="right floated content">
@@ -96,6 +95,9 @@
 						<div class="ui basic blue label">{{ task.categoryName }}</div>
 						<div class="ui basic blue label" *ngIf="task.slotTitle">
 							{{ task.slotTitle }}
+						</div>
+						<div class="ui basic blue label">
+							Rs. {{ task.amountCollected  }}
 						</div>
 					</div>
 				</div>
