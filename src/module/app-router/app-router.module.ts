@@ -26,7 +26,7 @@ const routes: Routes = [
     path: 'home', component: HomeComponent
   },
   {
-    path: 'directory', component: DirectoryComponent
+    path: 'admin/directory', component: DirectoryComponent
   },
   {
     path: 'cashbook/view', component: AccountDetailsComponent
@@ -44,7 +44,7 @@ const routes: Routes = [
     path: 'login', component: LoginComponent
   },
   {
-    path: 'batch', component: ListBatchComponent
+    path: 'admin/batch/list', component: ListBatchComponent
   },
   {
     path: 'task/create', component: CreateTaskComponent
@@ -56,7 +56,7 @@ const routes: Routes = [
     path: 'task', component: TaskComponent
   },
   {
-    path: 'batch/create', component: BatchFormComponent
+    path: 'admin/batch/create', component: BatchFormComponent
   },
   {
     path: 'cashbook/balance', component: AccountBalanceComponent

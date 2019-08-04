@@ -2,7 +2,6 @@ import { NotificationService } from './../../service/notification.service';
 import { Directory } from './../../interface/directory';
 import { MySQLService } from './../../service/my-sql.service';
 import { Component, OnInit } from '@angular/core';
-import { resetCompiledComponents } from '@angular/core/src/render3/jit/module';
 
 @Component({
   selector: 'app-directory-form',

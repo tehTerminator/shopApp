@@ -1,5 +1,10 @@
 <div class="ui two column grid">
   <div class="six wide column">
+    <div class="ui icon fluid input">
+      <input type="text" name="searchText" [(ngModel)]="searchText" placeholder="Search Batch">
+      <i class="search icon"></i>
+    </div>
+    <hr>
     <table class="ui selectable compact table segment">
       <thead>
         <tr>
@@ -9,7 +14,7 @@
         </tr>
       </thead>
       <tbody>
-        <tr *ngFor="let b of batch" (click)="selectBatch(b)">
+        <tr *ngFor="let b of batch | search:'id,title,rate':searchText | slice:0:5" (click)="selectBatch(b)">
           <td>{{ b.id }}</td>
           <td>{{ b.title }}</td>
           <td>{{ b.rate }}</td>

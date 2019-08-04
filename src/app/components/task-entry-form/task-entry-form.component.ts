@@ -14,7 +14,7 @@ import { DirectoryService } from '../../service/directory.service';
   styleUrls: ['./task-entry-form.component.css']
 })
 export class TaskEntryFormComponent implements OnInit {
-  @ViewChild('name', { static: true }) nameField: ElementRef;
+  @ViewChild('name', { static: false }) nameField: ElementRef;
   selectedBatch = 0;
   batch: Array<Batch> = [];
   suggestion: Array<string> = [];
@@ -75,10 +75,12 @@ export class TaskEntryFormComponent implements OnInit {
       this.db.select('suggestion', {
         andWhere: {
           theName: ['LIKE', word]
-        }
-      }).subscribe((res: any) => {
+        },
+        limit: 3
+      }, true).subscribe((res: any) => {
         this.suggestion = [];
-        res.forEach((item: any) => {
+        console.log(res);
+        res.rows.forEach((item: any) => {
           this.suggestion.push(item.theName);
         });
         this.showSuggestion = this.suggestion.length > 0;

@@ -10,6 +10,7 @@ import { DirectoryService } from '../../service/directory.service';
 export class ListBatchComponent implements OnInit {
   batch = [];
   selectedBatch: Batch;
+  searchText = '';
   constructor(private mysql: MySQLService, public directory: DirectoryService) { }
 
   ngOnInit() {

@@ -2,7 +2,6 @@ import { Component, OnInit } from '@angular/core';
 import { UserService } from './../../service/user.service';
 import { DirectoryService } from './../../service/directory.service';
 import { MySQLService } from './../../service/my-sql.service';
-import { calcBindingFlags } from '@angular/core/src/view/util';
 
 @Component({
   selector: 'app-operator-report',
