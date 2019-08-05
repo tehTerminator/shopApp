@@ -162,11 +162,13 @@ export class MyTaskComponent implements OnInit, OnDestroy {
   }
 
   setRejected(theTask: Task) {
-    const index = this.assigned.indexOf(theTask);
-    this.refundMoney(theTask.id);
-    this.setstate(theTask, 'REJECTED');
-    theTask.state = 'REJECTED';
-    this.assigned.splice(index, 1);
+    if (confirm(`Do You Wish To Delete Task #${theTask.id} - ${theTask.customerName}`)) {
+      const index = this.assigned.indexOf(theTask);
+      this.refundMoney(theTask.id);
+      this.setstate(theTask, 'REJECTED');
+      theTask.state = 'REJECTED';
+      this.assigned.splice(index, 1);
+    }
   }
 
   private refundMoney(taskId: number): void {

@@ -3,7 +3,7 @@ import { UserService } from './../../service/user.service';
 import { DirectoryService } from './../../service/directory.service';
 import { MySQLService } from './../../service/my-sql.service';
 import { Task } from './../../interface/task';
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, ViewChild, ElementRef } from '@angular/core';
 
 @Component({
   selector: 'app-assign-task',
@@ -11,6 +11,7 @@ import { Component, OnInit } from '@angular/core';
   styleUrls: ['./assign-task.component.css']
 })
 export class AssignTaskComponent implements OnInit {
+  @ViewChild('id', { static: false }) idField: ElementRef;
   taskId: number;
   task: Task;
   selectedUserId: number;
@@ -39,7 +40,6 @@ export class AssignTaskComponent implements OnInit {
   }
 
   get() {
-    console.log(this.taskId);
     this.mysql.select('task', { andWhere: { id: this.taskId } }, true).subscribe((res: any) => {
       if (res.rows.length >= 1) {
         this.task = res.rows[0];
@@ -49,10 +49,9 @@ export class AssignTaskComponent implements OnInit {
             task_id: this.task.id
           }
         }, true).subscribe((res2: any) => {
-          console.log(res2);
           if ( res2.rows.length > 0 ) {
             const slot = this.slots.find(x => +x.id === +res2.rows[0].slot_id);
-            this.description = ` Slot - ${res2.rows[0].forDate} - ${slot.startTime} to ${slot.endTime}`;
+            this.description = ` Slot - ${res2.rows[0].forDate} - ${slot.title}`;
           }
         });
       } else {
@@ -88,6 +87,8 @@ export class AssignTaskComponent implements OnInit {
         });
       });
     }
+    this.idField.nativeElement.focus();
+    this.taskId = 0;
   }
 
   private getSlots(): void {

@@ -2,32 +2,39 @@
   Assign Task
 </div>
 <div class="ui bottom attached form stacked segment">
-  <div class="ui fluid action input">
-    <input type="number" name="id" min="0" step="1" (change)="get()" [(ngModel)]="taskId">
-    <button class="ui icon button" (click)="get()">
-      <i class="search icon"></i>
-    </button>
-  </div>
-  <div class="ui list" [hidden]="taskId === 0">
-    <hr>
-    <div class="item">
-      Customer Name : <strong>{{ task.customerName }}</strong>
-    </div>
-    <div class="item">
-      Category : <strong>{{ task.categoryName }}</strong>
-    </div>
-    <div class="item">
-      Inserted At : <strong>{{ task.insertedAt | date: 'short'}}</strong>
-    </div>
-    <div class="item">
-      state : <strong> {{ task.state }}</strong>
-    </div>
-    <div class="item" [hidden]="task.comment === null || task.comment.length === 0">
-      Description: <strong>{{ task.comment }}</strong>{{ description }}
-    </div>
-  </div>
-  <hr>
   <div class="field">
+    <label for="taskId">Task Id</label>
+    <div class="ui icon input">
+      <input #id type="number" name="id" min="0" step="1" (change)="get()" [(ngModel)]="taskId">
+      <i class="hashtag icon"></i>
+    </div>
+  </div>
+  <table class="ui compact celled small table segment" [hidden]="taskId === 0">
+    <tbody>
+      <tr>
+        <td>Name</td>
+        <td>{{ task.customerName }}</td>
+      </tr>
+      <tr>
+        <td>Category</td>
+        <td>{{ task.categoryName }}</td>
+      </tr>
+      <tr>
+        <td>Inserted At</td>
+        <td>{{ task.insertedAt | date: 'dd-MMM hh:mm aa'}}</td>
+      </tr>
+      <tr>
+        <td>State</td>
+        <td>{{ task.state }}</td>
+      </tr>
+      <tr>
+        <td>Description</td>
+        <td>{{ task.comment }} {{ description }}</td>
+      </tr>
+    </tbody>
+  </table>
+  <div class="field" [hidden]="taskId === 0">
+    <label for="assignTo">Assign To User</label>
     <select name="assignTo" [(ngModel)]="selectedUserId">
       <option *ngFor="let user of userService.getAll()" [value]="user.id">
         {{ user.name }}
@@ -35,5 +42,5 @@
     </select>
   </div>
 
-  <button class="ui fluid button" [hidden]="taskId===0 || task.state === 'COMPLETED' " (click)="set()">Assign</button>
+  <button class="ui fluid blue button" [hidden]="taskId===0 || task.state === 'COMPLETED' " (click)="set()">Assign</button>
 </div>

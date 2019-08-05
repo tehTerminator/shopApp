@@ -11,14 +11,14 @@
       <div class="ui three cards">
         <div class="raised card" *ngFor="let task of assigned">
           <div class="ui top attached inverted header">
-            {{ task.customerName }}
+            {{ task.customerName | titlecase }}
             <div class="ui right floated red label">{{ task.id }}</div>
           </div>
           <div class="content">
             <img class="ui right floated mini image">
             <div class="meta">{{ task.insertedAt | date:'dd-MMM hh:mm a' }}</div>
             <div class="description">
-              Paid {{ task.amountCollected }} for {{ task.categoryName }} {{ task.comment }}. Task Inserted By {{ task.insertedByUser.name }}
+              Paid {{ task.amountCollected }} for {{ task.categoryName }} {{ task.comment }}.
             </div>
           </div>
   
