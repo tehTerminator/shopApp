@@ -18,7 +18,7 @@
     <input type="text" placeholder="Search..." name="searchServiceText" [(ngModel)]="searchServiceText">
   </div>
   <div class="ui divided relaxed selection list">
-    <div class="item" *ngFor="let b of batch|search:'rate,title':searchServiceText|slice:0:10" (click)="selectBatch(b)">
+    <div class="item" *ngFor="let b of batch|search:'rate,title':searchServiceText|slice:0:5" (click)="selectBatch(b)">
       <div class="right floated content">
         Rs. {{ b.rate }}
       </div>

@@ -17,9 +17,9 @@ export class LiveViewComponent implements OnInit, OnDestroy {
   theDate: Date = new Date();
   selectedDirectory: Directory;
   private timerSubscription: any;
-  selectedCategory: string;
+  selectedCategory = '';
   searchText: string;
-  selectedState: string;
+  selectedState = '';
   slotBased = true;
   slots: Array<any> = [];
 

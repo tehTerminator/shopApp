@@ -2,12 +2,11 @@
   Booking Status
 </div>
 <div class="ui bottom attached segment">
-  <div class="ui fluid action input">
-    <input type="date" name="theDate" [(ngModel)]="theDate">
+  <div class="ui mini fluid action input">
+    <input type="date" [ngModel]="theDate | date:'yyyy-MM-dd'" (ngModelChange)="theDate = $event"> 
     <button class="ui blue button" (click)="get()">Get</button>
   </div>
-  <hr>
-  <table class="ui table segment">
+  <table class="ui compact center aligned mini celled table">
     <thead>
       <tr>
         <th>

@@ -53,19 +53,23 @@ export class TaskEntryFormComponent implements OnInit {
           title: `${item.startTime} to ${item.endTime}`
         });
       });
+      if( this.slots.length > 0 ){
+        this.slotId = this.slots[0].id;
+      }
     });
+    this.categoryId = this.ds.getCategories()[0].id;
+    this.loadBatch();
   }
 
   loadBatch(): void {
     // Load Batch Task from Server
-    console.log('Load Batch Called')
     this.db.select('batch', { orderBy: 'title ASC' }).subscribe((res: any) => {
       const allBatch = [];
       Array.from(res).forEach((s: any) => {
         allBatch.push(new Batch(s.id, s.title, s.rate, s.settings));
       });
-      console.table(allBatch);
       this.batch = allBatch.filter((x: Batch) => x.hasCategory(+this.categoryId));
+      this.selectedBatch = this.batch[0].id;
     });
   }
 

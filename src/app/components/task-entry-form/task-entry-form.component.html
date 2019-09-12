@@ -11,7 +11,7 @@
     </div>
     <div class="field">
       <label for="slotDate">For Date</label>
-      <input type="date" [(ngModel)]="slotDate">
+      <input type="date" [ngModel]="slotDate | date:'yyyy-MM-dd'" (ngModelChange)="slotDate = $event">
     </div>
   </div>
 
@@ -40,19 +40,18 @@
     <div class="field">
       <label for="slotTime">For Time</label>
       <select name="slotTime" id="" class="ui fluid dropdown" [(ngModel)]="slotId">
-        <option>Select Slot</option>
         <option class="item" *ngFor="let s of slots" [value]="s.id">{{ s.title }}</option>
       </select>
     </div>
   </div>
   <!-- </div> -->
 
-  <button class="ui inverted basic green button" [hidden]="task.customerName.length <= 2" (click)="save(false)">
-    Save
-  </button>
   <button class="ui inverted basic green button" [hidden]="task.customerName.length <= 2" (click)="save(true)">
     Save &amp; Book Slot
   </button>
+  <!-- <button class="ui inverted basic green button" [hidden]="task.customerName.length <= 2" (click)="save(false)">
+    Save
+  </button> -->
   <button class="ui inverted basic red button" (click)="reset()">
     Reset
   </button>

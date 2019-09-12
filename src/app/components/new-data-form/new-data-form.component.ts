@@ -53,6 +53,10 @@ export class NewDataFormComponent implements OnInit {
             alert('Empty Batch');
             this.reset();
         }
+        //Move Selected to Top of List
+        const index = this.batch.indexOf(theBatch);
+        this.batch.splice(index, 1);
+        this.batch.unshift(theBatch);
     }
 
     updateGiver(giverId: number, index: number): void {

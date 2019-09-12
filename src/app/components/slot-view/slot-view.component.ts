@@ -8,7 +8,7 @@ import { interval } from 'rxjs';
   styleUrls: ['./slot-view.component.css']
 })
 export class SlotViewComponent implements OnInit, OnDestroy {
-  theDate: Date;
+  theDate: Date = new Date();
   slots: Array<any> = [];
   total = 0;
   completed = 0;
