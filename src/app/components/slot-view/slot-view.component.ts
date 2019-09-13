@@ -8,7 +8,7 @@ import { interval } from 'rxjs';
   styleUrls: ['./slot-view.component.css']
 })
 export class SlotViewComponent implements OnInit, OnDestroy {
-  theDate: Date = new Date();
+  theDate: string;
   slots: Array<any> = [];
   total = 0;
   completed = 0;
@@ -38,7 +38,9 @@ export class SlotViewComponent implements OnInit, OnDestroy {
           id: +item.id,
           title: `${item.startTime} - ${item.endTime}`,
           totalCount: 0,
-          completed: 0
+          completed: 0,
+          startTime: +item.startTime.substr(0, 2),
+          endTime: +item.endTime.substr(0, 2)
         });
       });
     });
@@ -71,5 +73,15 @@ export class SlotViewComponent implements OnInit, OnDestroy {
         this.total += 1;
       }
     });
+  }
+
+  getClass(startTime: number, endTime: number): string {
+    const currentTime = new Date();
+    console.log(currentTime, startTime, endTime);
+    if( currentTime.getHours() >= startTime && currentTime.getHours() < endTime ){
+      return 'active';
+    } else {
+      return '';
+    }
   }
 }

@@ -2,9 +2,9 @@
   Booking Status
 </div>
 <div class="ui bottom attached segment">
-  <div class="ui mini fluid action input">
-    <input type="date" [ngModel]="theDate | date:'yyyy-MM-dd'" (ngModelChange)="theDate = $event"> 
-    <button class="ui blue button" (click)="get()">Get</button>
+  <div class="ui mini fluid icon input">
+    <input type="date" [(ngModel)]="theDate" (change)="get()"> 
+    <i class="calendar icon"></i>
   </div>
   <table class="ui compact center aligned mini celled table">
     <thead>
@@ -18,7 +18,7 @@
       </tr>
     </thead>
     <tbody>
-      <tr *ngFor="let t of slots">
+      <tr *ngFor="let t of slots" [class]="getClass(t.startTime, t.endTime)">
         <td>{{ t.title }}</td>
         <td>{{ t.completed }} / {{ t.totalCount }}</td>
       </tr>
