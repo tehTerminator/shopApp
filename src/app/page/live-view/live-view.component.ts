@@ -14,7 +14,7 @@ import { interval } from 'rxjs';
 })
 export class LiveViewComponent implements OnInit, OnDestroy {
   tasks: Array<Task> = [];
-  theDate: Date = new Date();
+  theDate: string;
   selectedDirectory: Directory;
   private timerSubscription: any;
   selectedCategory = '';
@@ -102,8 +102,8 @@ export class LiveViewComponent implements OnInit, OnDestroy {
       }
     }
     this.mysql.select(tableName, request, true).subscribe((res: any) => {
-      this.tasks = [];
       console.log(res);
+      this.tasks = [];
       Array.from(res.rows).forEach((item: Task) => {
         delete(item.forDate);
         item.categoryName = this.directory.get(item.category_id).name;

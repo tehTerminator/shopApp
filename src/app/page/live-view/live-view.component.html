@@ -23,7 +23,7 @@
 			<div class="field">
 				<label for="theDate">Date</label>
 				<div class="ui fluid labeled input">
-					<input type="date" name="theDate" [ngModel]="theDate | date:'yyyy-MM-dd'" (ngModelChange)="theDate = $event" (change)="get()">
+					<input type="date" name="theDate" [(ngModel)]="theDate" (change)="get()">
 				</div>
 			</div>
 			<div class="two fields">
