@@ -16,9 +16,8 @@ export class BatchService {
   private cashbookSaved = false;
   private taskInserted = false;
   private productInserted = false;
-  private slotsSaved = true;
   private slotId: number;
-  private slotDate: Date;
+  private slotDate: string;
   private slotTitle: string;
 
   constructor(
@@ -43,7 +42,7 @@ export class BatchService {
     this.productInserted = false;
   }
 
-  public setSlot(id: number, date: Date, title: string): void {
+  public setSlot(id: number, date: string, title: string): void {
     this.slotId = id;
     this.slotDate = date;
     this.slotTitle = title;
@@ -63,6 +62,7 @@ export class BatchService {
    * Saves Task Details
    */
   private saveTask(): void {
+    console.log(this.task);
     const customer = this.task.customerName;
     if ( this.task.category_id === 0 ) {
       return;
@@ -83,8 +83,6 @@ export class BatchService {
       return;
     }
 
-    console.log(this.task, 'Before Insertion');
-
     this.mysql.insert('task', {
       userData: this.task
     }, true).subscribe((res: any) => {
@@ -93,6 +91,7 @@ export class BatchService {
       if (this.task.amountCollected > 0) {
         this.saveCashBookEntry(false);
       }
+      console.log(this.slotId);
       if ( this.task.id > 0 && this.slotId > 0 ) {
         this.mysql.insert('bookings', {
           userData: {
