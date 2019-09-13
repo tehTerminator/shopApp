@@ -23,7 +23,7 @@ export class TaskEntryFormComponent implements OnInit {
   cashTransactions: Array<CashTransaction> = [];
   productTransactions: Array<ProductTransaction> = [];
   slots: Array<any> = [];
-  slotDate = new Date();
+  slotDate: string;
   slotId: number;
   categoryId: number;
 
@@ -50,14 +50,12 @@ export class TaskEntryFormComponent implements OnInit {
       Array.from(res).forEach((item: any) => {
         this.slots.push({
           id: +item.id,
-          title: `${item.startTime} to ${item.endTime}`
+          title: `${item.startTime} to ${item.endTime}`,
+          startTime: +item.startTime.substr(0,2),
+          endTime: +item.endTime.substr(0, 2)
         });
       });
-      if( this.slots.length > 0 ){
-        this.slotId = this.slots[0].id;
-      }
     });
-    this.categoryId = this.ds.getCategories()[0].id;
     this.loadBatch();
   }
 
@@ -69,7 +67,6 @@ export class TaskEntryFormComponent implements OnInit {
         allBatch.push(new Batch(s.id, s.title, s.rate, s.settings));
       });
       this.batch = allBatch.filter((x: Batch) => x.hasCategory(+this.categoryId));
-      this.selectedBatch = this.batch[0].id;
     });
   }
 
@@ -107,6 +104,17 @@ export class TaskEntryFormComponent implements OnInit {
   }
 
   save(bookSlot: boolean) {
+    const currentTime = new Date();
+    const bookingTime = new Date(this.slotDate);
+    const hour = this.slots.find(x=>x.id === +this.slotId).endTime;
+    bookingTime.setHours(hour);
+
+    console.log('Booking Time', bookingTime);
+    console.log('Current Time', currentTime);
+    if( bookingTime < currentTime ){
+      alert('Invalid Booking Time, Please Correct Date and Time');
+      return;
+    }
 
     // Update Word Dictionary
     const wordArray = this.task.customerName.split(' ');
@@ -115,8 +123,6 @@ export class TaskEntryFormComponent implements OnInit {
         userData: {
           theName: item
         }
-      }, true).subscribe((res: any) => {
-        console.log(res.query);
       });
     });
 
@@ -186,5 +192,9 @@ export class TaskEntryFormComponent implements OnInit {
         return txt.charAt(0).toUpperCase() + txt.substr(1).toLowerCase();
       }
     );
+  }
+
+  nameToTitleCase(): void {
+    this.task.customerName = this.toTitleCase(this.task.customerName);
   }
 }

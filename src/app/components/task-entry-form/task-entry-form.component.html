@@ -11,7 +11,7 @@
     </div>
     <div class="field">
       <label for="slotDate">For Date</label>
-      <input type="date" [ngModel]="slotDate | date:'yyyy-MM-dd'" (ngModelChange)="slotDate = $event">
+      <input type="date" [(ngModel)]="slotDate">
     </div>
   </div>
 
@@ -19,7 +19,7 @@
     <label for="customerName">Customer Name</label>
     <div class="ui input">
       <input type="text" #name name="customerName" [(ngModel)]="task.customerName"
-        (input)="onSearchChange()" (keydown.enter)="useSuggestion(suggestion[0])">
+        (input)="onSearchChange()" (keydown.enter)="useSuggestion(suggestion[0])" (blur)="nameToTitleCase()">
     </div> 
   </div>
   <a class="ui small-margin blue label" *ngFor="let name of suggestion" (click)="useSuggestion(name)">
