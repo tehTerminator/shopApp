@@ -18,7 +18,7 @@
     <input type="text" placeholder="Search..." name="searchServiceText" [(ngModel)]="searchServiceText">
   </div>
   <div class="ui divided relaxed selection list">
-    <div class="item" *ngFor="let b of batch|search:'rate,title':searchServiceText|slice:0:5" (click)="selectBatch(b)">
+    <div class="item" *ngFor="let b of batch|search:'rate,title':searchServiceText|slice:0:10" (click)="selectBatch(b)">
       <div class="right floated content">
         Rs. {{ b.rate }}
       </div>
@@ -38,11 +38,17 @@
   <div [hidden]="!selectedBatch.doesItCreatesTask()">
     <div class="required field">
       <label for="customerName">Customer Name</label>
-      <input type="text" [(ngModel)]="task.customerName">
+      <div class="ui icon input">
+        <input type="text" [(ngModel)]="task.customerName">
+        <i class="user icon"></i>
+      </div>
     </div>
     <div class="field">
       <label for="amountCollected">Amount Collected</label>
-      <input type="number" min="0" step="0.01" name="amountCollected" [(ngModel)]="task.amountCollected">
+      <div class="ui icon input">
+        <input type="number" min="0" step="0.01" name="amountCollected" [(ngModel)]="task.amountCollected">
+        <i class="rupee icon"></i>
+      </div>
     </div>
     <div class="field">
       <label for="paymentstate">state</label>

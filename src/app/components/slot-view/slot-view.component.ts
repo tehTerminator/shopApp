@@ -1,6 +1,7 @@
 import { Component, OnInit, OnDestroy } from '@angular/core';
 import { MySQLService } from './../../service/my-sql.service';
 import { interval } from 'rxjs';
+import { DatePipe } from '@angular/common';
 
 @Component({
   selector: 'app-slot-view',
@@ -14,14 +15,16 @@ export class SlotViewComponent implements OnInit, OnDestroy {
   completed = 0;
   private timerSubscription: any;
 
-  constructor(private db: MySQLService) { }
+  constructor(private db: MySQLService, private datePipe: DatePipe) { }
 
   ngOnInit() {
+    this.theDate = this.datePipe.transform(new Date(), 'yyyy-MM-dd');
     this.getSlots();
     const timer = interval(1000 * 60);
     this.timerSubscription = timer.subscribe(() => {
       this.get();
     });
+    this.get();
   }
 
   ngOnDestroy() {

@@ -7,6 +7,7 @@ import { BatchService } from '../../service/batch.service';
 import { CashTransaction } from '../../interface/cash-transaction';
 import { ProductTransaction } from '../../interface/product-transaction';
 import { DirectoryService } from '../../service/directory.service';
+import { DatePipe } from '@angular/common';
 
 @Component({
   selector: 'app-task-entry-form',
@@ -31,7 +32,8 @@ export class TaskEntryFormComponent implements OnInit {
     private db: MySQLService,
     private us: UserService,
     private bs: BatchService,
-    public ds: DirectoryService
+    private datePipe: DatePipe,
+    public ds: DirectoryService,
   ) { }
 
   ngOnInit() {
@@ -43,6 +45,8 @@ export class TaskEntryFormComponent implements OnInit {
       amountCollected: 0,
       state: 'INACTIVE',
     };
+
+    this.slotDate = this.datePipe.transform(new Date(), 'yyyy-MM-dd');
 
 
     // Load Slots

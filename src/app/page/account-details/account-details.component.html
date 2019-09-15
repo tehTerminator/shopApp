@@ -6,11 +6,11 @@
     <div class="ui form segment">
       <div class="field">
         <label for="date">From Date</label>
-        <input type="text" name="date" [(ngModel)]="fromDate" mask="0000-M0-d0">
+        <input type="date" name="date" [(ngModel)]="fromDate">
       </div>
       <div class="field" [hidden]="singleDay">
         <label for="toDate">To Date</label>
-        <input type="text" name="toDate" [(ngModel)]="toDate" mask="0000-M0-d0">
+        <input type="date" name="toDate" [(ngModel)]="toDate">
       </div>
       <div class="field">
         <label for="accountId">Account</label>

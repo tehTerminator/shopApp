@@ -7,10 +7,10 @@ import { map } from 'rxjs/operators';
 })
 export class MySQLService {
   // Testing Link Comment during production
-  private serverLink = 'http://localhost:80/api/sql.php';
+  // private serverLink = 'http://localhost:80/api/sql.php';
 
   // Uncomment For Production Build
-  // private serverLink = 'http://192.168.0.10/api/sql.php';
+  private serverLink = 'http://192.168.0.10/api/sql.php';
 
   constructor(private http: HttpClient) { }
 

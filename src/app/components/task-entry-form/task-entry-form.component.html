@@ -11,15 +11,19 @@
     </div>
     <div class="field">
       <label for="slotDate">For Date</label>
-      <input type="date" [(ngModel)]="slotDate">
+      <div class="ui icon input">
+        <input type="date" [(ngModel)]="slotDate">
+        <i class="calendar icon"></i>
+      </div>
     </div>
   </div>
 
   <div class="field">
     <label for="customerName">Customer Name</label>
-    <div class="ui input">
+    <div class="ui icon input">
       <input type="text" #name name="customerName" [(ngModel)]="task.customerName"
         (input)="onSearchChange()" (keydown.enter)="useSuggestion(suggestion[0])" (blur)="nameToTitleCase()">
+        <i class="user icon"></i>
     </div> 
   </div>
   <a class="ui small-margin blue label" *ngFor="let name of suggestion" (click)="useSuggestion(name)">

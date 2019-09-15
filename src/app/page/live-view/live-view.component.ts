@@ -6,6 +6,7 @@ import { Component, OnInit, OnDestroy } from '@angular/core';
 import { Task } from '../../interface/task';
 import { User } from '../../class/user';
 import { interval } from 'rxjs';
+import { DatePipe } from '@angular/common';
 
 @Component({
   selector: 'app-live-view',
@@ -27,7 +28,8 @@ export class LiveViewComponent implements OnInit, OnDestroy {
   constructor(
     private mysql: MySQLService,
     private userService: UserService,
-    public directory: DirectoryService
+    public directory: DirectoryService,
+    private datePipe: DatePipe
   ) { }
 
 
@@ -44,6 +46,8 @@ export class LiveViewComponent implements OnInit, OnDestroy {
         });
       });
     });
+    this.theDate = this.datePipe.transform(new Date(), 'yyyy-MM-dd');
+    this.get();
   }
 
   ngOnDestroy() {

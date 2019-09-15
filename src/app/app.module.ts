@@ -50,6 +50,7 @@ import { SlotViewComponent } from './components/slot-view/slot-view.component';
 import { SearchTaskByNameComponent } from './components/search-task-by-name/search-task-by-name.component';
 import { ManageTaskComponent } from './page/manage-task/manage-task.component';
 import { TaskReportComponent } from './page/task-report/task-report.component'
+import { DatePipe } from '@angular/common';
 
 export const options: Partial<IConfig> | (() => Partial<IConfig>) = {};
 
@@ -106,7 +107,7 @@ export const options: Partial<IConfig> | (() => Partial<IConfig>) = {};
     BrowserAnimationsModule,
     NgxMaskModule.forRoot(options)
   ],
-  providers: [DirectoryService, NotificationService],
+  providers: [DirectoryService, NotificationService, DatePipe],
   bootstrap: [AppComponent]
 })
 export class AppModule { }
