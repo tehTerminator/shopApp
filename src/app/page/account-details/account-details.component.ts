@@ -1,7 +1,7 @@
 import { DirectoryService } from './../../service/directory.service';
 import { UserService } from './../../service/user.service';
 import { MySQLService } from './../../service/my-sql.service';
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, ElementRef, ViewChild } from '@angular/core';
 import { CashTransaction } from '../../interface/cash-transaction';
 import { DatePipe } from '@angular/common';
 
@@ -12,6 +12,7 @@ import { DatePipe } from '@angular/common';
   providers: [DatePipe]
 })
 export class AccountDetailsComponent implements OnInit {
+  @ViewChild('amount', { static: false }) amountField: ElementRef;
   transactions: Array<CashTransaction> = [];
   selectedAccount: number;
   fromDate = '';
@@ -20,6 +21,7 @@ export class AccountDetailsComponent implements OnInit {
   authLevel = this.us.currentUser.authLevel;
   trackedAmounts: Array<number> = [];
   checkCommand: string;
+  grouped = false;
 
   constructor(
     private mysql: MySQLService,
@@ -45,7 +47,7 @@ export class AccountDetailsComponent implements OnInit {
     this.mysql.select('balance', {
       andWhere: {
         account_id: this.selectedAccount,
-        postedOn: this.fromDate
+        'DATE(postedOn)': this.fromDate
       }
     }).subscribe((res: any) => {
       this.transactions = [];
@@ -53,7 +55,7 @@ export class AccountDetailsComponent implements OnInit {
         this.transactions.push({
           id: 0,
           giver_id: 0,
-          giver: 'Self',
+          giver: 'Self - Opening Balance',
           receiver_id: +this.selectedAccount,
           receiver: this.directory.get(+this.selectedAccount).name,
           amount: +res[0].openingBalance,
@@ -82,16 +84,9 @@ export class AccountDetailsComponent implements OnInit {
     });
   }
 
-  getClass(t: CashTransaction): string {
-    if (+t.receiver_id === +this.selectedAccount) {
-      return 'positive';
-    } else {
-      return 'negative';
-    }
-  }
-
   private getStatement(): void {
     const request = {
+      columns: ['giver_id', 'receiver_id', 'SUM(amount) as amount'],
       andWhere: {
         orWhere: {
           giver_id: this.selectedAccount,
@@ -99,30 +94,36 @@ export class AccountDetailsComponent implements OnInit {
         },
         andWhere: {}
       },
-      orderBy: 'postedOn ASC'
+      orderBy: 'postedOn ASC',
+      groupBy: 'giver_id, receiver_id'
     };
 
     if (this.singleDay) {
-      const fromDate = this.datePipe.transform( this.strToDate(this.fromDate), 'yyyy-MM-dd');
       request.andWhere.andWhere = {
-        'DATE(postedOn)': ['BETWEEN', fromDate, fromDate],
+        'DATE(postedOn)': this.fromDate,
         state: ['<>', 'REJECTED']
       };
+      console.log('request', request);
     } else {
       if (this.fromDate > this.toDate) {
         alert('From Date should be smaller than to toDate');
         return;
       } else {
-        const fromDate = this.datePipe.transform( this.strToDate(this.fromDate), 'yyyy-MM-dd');
-        const toDate = this.datePipe.transform( this.strToDate(this.toDate), 'yyyy-MM-dd');
         request.andWhere.andWhere = {
-          'DATE(postedOn)': ['BETWEEN', fromDate, toDate],
+          'DATE(postedOn)': ['BETWEEN', this.fromDate, this.toDate],
           state: ['<>', 'REJECTED']
         };
       }
     }
 
-    this.mysql.select('cashbook', request).subscribe((res: Array<CashTransaction>) => {
+    if (!this.grouped) {
+      delete request.columns;
+      delete request.groupBy;
+    }
+
+    this.mysql.select('cashbook', request, true).subscribe((response: any) => {
+      console.log(response.query);
+      const res = response.rows;
       Array.from(res).forEach((item: CashTransaction) => {
         item.giver = this.directory.get(+item.giver_id).name;
         item.receiver = this.directory.get(+item.receiver_id).name;
@@ -191,6 +192,7 @@ export class AccountDetailsComponent implements OnInit {
         this.trackedAmounts.push(amount);
       }
     }
-
+    this.amountField.nativeElement.focus();
+    this.checkCommand = '';
   }
 }

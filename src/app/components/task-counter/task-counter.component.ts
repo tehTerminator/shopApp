@@ -37,7 +37,7 @@ export class TaskCounterComponent implements OnInit, OnDestroy {
         'DATE(insertedAt)': ['CURDATE()', 'noQuotes']
       },
       groupBy: 'category_id, state'
-    }).subscribe((res: any)=>{
+    }).subscribe((res: any) => {
       Array.from(res).forEach((item: any) => {
         this.pushData(+item.category_id, +item.count, item.state);
       });

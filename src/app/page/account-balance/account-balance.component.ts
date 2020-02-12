@@ -2,6 +2,7 @@ import { NotificationService } from './../../service/notification.service';
 import { DirectoryService } from './../../service/directory.service';
 import { MySQLService } from './../../service/my-sql.service';
 import { Component, OnInit } from '@angular/core';
+import { DatePipe } from '@angular/common';
 
 @Component({
   selector: 'app-account-balance',
@@ -9,16 +10,21 @@ import { Component, OnInit } from '@angular/core';
   styleUrls: ['./account-balance.component.css']
 })
 export class AccountBalanceComponent implements OnInit {
-  postedOn: Date = new Date();
+  postedOn: string;
   selectedAccount: number;
   balance: number;
 
   data: Array<any> = [];
 
-  constructor(private mysql: MySQLService, private notice: NotificationService, public directory: DirectoryService) { }
+  constructor(
+    private mysql: MySQLService,
+    private notice: NotificationService,
+    public directory: DirectoryService,
+    private datePipe: DatePipe
+  ) { }
 
-    ngOnInit() {
-    this.postedOn = new Date();
+  ngOnInit() {
+    this.postedOn = this.datePipe.transform(new Date(), 'yyyy-MM-dd');
     this.reset();
   }
 
@@ -41,6 +47,30 @@ export class AccountBalanceComponent implements OnInit {
   }
 
   save() {
+
+    const filteredAccount = this.data.find( x => x.account_id === this.selectedAccount );
+    if (filteredAccount !== undefined ) {
+      filteredAccount.openingBalance = this.balance;
+      this.mysql.update('balance', {
+        andWhere: {
+          postedOn: this.postedOn,
+          account_id: this.selectedAccount,
+        },
+        userData: {
+          openingBalance: this.balance
+        }
+      }, true).subscribe((res: any) => {
+        console.log(res);
+        this.notice.changeMessage({
+          text: `Updated Opening Balance of
+            ${this.directory.get(this.selectedAccount).name} at ${this.postedOn} is = ${filteredAccount.openingBalance}`,
+          state: 'green'
+        });
+      });
+      this.reset();
+      return;
+    }
+
     this.mysql.insert('balance', {
       userData: {
         postedOn: this.postedOn,

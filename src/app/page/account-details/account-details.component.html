@@ -19,6 +19,12 @@
           <option *ngFor="let account of directory.getAccounts()" [value]="account.id">{{ account.name }}</option>
         </select>
       </div>
+      <div class="field">
+        <div class="ui checkbox">
+          <input type="checkbox" name="grouped" [(ngModel)]="grouped">
+          <label for="grouped">Grouped</label>
+        </div>
+      </div>
       <hr>
       <button class="ui fluid blue button" (click)="get()">Show</button>
     </div>
@@ -26,49 +32,56 @@
     <app-cash-book-form></app-cash-book-form>
     <hr>
     <div class="ui fluid action input">
-      <input type="text" name="checkAmount" [(ngModel)]="checkCommand">
+      <input #amount type="text" name="checkAmount" [(ngModel)]="checkCommand">
       <button class="ui blue button" (click)="check()">Submit</button>
     </div>
   </div>
   <div class="twelve wide column">
-    <div class="scrollable">
+    <div class="">
       <h2 class="ui center aligned header" [hidden]="transactions.length > 0">No Transactions Details</h2>
-      <table class="ui selectable mini compant celled table" [hidden]="transactions.length === 0">
+      <table class="ui selectable mini compant celled striped table" [hidden]="transactions.length === 0">
         <thead>
           <tr>
-            <th>#</th>
-            <th>Time</th>
-            <th>Description</th>
+            <th [hidden]="grouped">#</th>
+            <th [hidden]="grouped">Time</th>
+            <th [hidden]="grouped">Description</th>
             <th>Transfer</th>
-            <th>Amount</th>
+            <th>Out (-)</th>
+            <th>In (+)</th>
             <th>Balance</th>
           </tr>
         </thead>
         <tbody>
-          <tr *ngFor="let t of transactions" [ngClass]="getClass(t)">
-            <td>
+          <tr *ngFor="let t of transactions">
+            <td [hidden]="grouped">
               {{ t.id }}
               <i *ngIf="authLevel > 5" class="close icon" (click)="delete(t.id)"></i>
             </td>
-            <td>{{ t.postedOn | date:'d/M hh:mm aa'}}</td>
-            <td>{{ t.description }}</td>
-            <td>{{ +t.giver_id === +selectedAccount ? t.receiver : t.giver }}
+            <td [hidden]="grouped">{{ t.postedOn | date:'d/M hh:mm aa'}}</td>
+            <td [hidden]="grouped">{{ t.description }}</td>
+            <td>
+              {{ +t.giver_id === +selectedAccount ? t.receiver : t.giver }}
+              <i class="check icon" *ngIf="t.match"></i>
             </td>
             <td class="right aligned">
-              <i class="check icon" *ngIf="t.match"></i>
-              {{ t.amount | number: '1.2-2' }}
+                {{ +t.giver_id !== +selectedAccount ? 0 : t.amount | number: '1.2-2' }}
+              </td>
+            <td class="right aligned">
+              {{ +t.giver_id === +selectedAccount ? 0 : t.amount | number: '1.2-2' }}
             </td>
+            
             <td class="right aligned">{{ t.balance | number:'1.2-2' }}</td>
           </tr>
         </tbody>
         <tfoot>
           <tr>
-            <th>#</th>
-            <th>Time</th>
-            <th>Description</th>
-            <th>Transfer</th>
-            <th>Amount</th>
-            <th>Balance</th>
+              <th [hidden]="grouped">#</th>
+              <th [hidden]="grouped">Time</th>
+              <th [hidden]="grouped">Description</th>
+              <th>Transfer</th>
+              <th>Debit(-)</th>
+              <th>Credit(+)</th>
+              <th>Balance</th>  
           </tr>
         </tfoot>
       </table>

@@ -91,7 +91,6 @@ export class BatchService {
       if (this.task.amountCollected > 0) {
         this.saveCashBookEntry(false);
       }
-      console.log(this.slotId);
       if ( this.task.id > 0 && this.slotId > 0 ) {
         this.mysql.insert('bookings', {
           userData: {
@@ -128,11 +127,11 @@ export class BatchService {
         const message = `Inserted ${item.productName} for Rs.${item.amount}`;
         delete (item.id);
         delete (item.productName);
-        delete (item.amount);
-        if (item.quantity > 0) {
+        if (+item.quantity > 0) {
           this.mysql.insert('productUsage', {
             userData: item
-          }).subscribe(() => {
+          }, true).subscribe((res: any) => {
+            console.log(res);
             this.notice.changeMessage({
               text: message,
               state: 'green'

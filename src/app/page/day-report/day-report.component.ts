@@ -1,6 +1,7 @@
 import { Component, OnInit } from '@angular/core';
 import { DirectoryService } from './../../service/directory.service';
 import { MySQLService } from './../../service/my-sql.service';
+import { DatePipe } from '@angular/common';
 
 @Component({
   selector: 'app-day-report',
@@ -8,7 +9,7 @@ import { MySQLService } from './../../service/my-sql.service';
   styleUrls: ['./day-report.component.css']
 })
 export class DayReportComponent implements OnInit {
-  theDate: Date;
+  theDate: string;
   accountList: Array<string> = [
     'sales',
     'commission',
@@ -17,14 +18,18 @@ export class DayReportComponent implements OnInit {
     'mponline',
     'csc',
     'sbi maharaja',
-    'digipay'
+    'hdfc bank'
   ];
   selectedAccount: number;
 
-  constructor(private mysql: MySQLService, public dir: DirectoryService) { }
+  constructor(
+    private mysql: MySQLService,
+    public dir: DirectoryService,
+    private datePipe: DatePipe
+  ) { }
 
   ngOnInit() {
-    this.theDate = new Date();
+    this.theDate = this.datePipe.transform( new Date(), 'yyyy-MM-dd');
   }
 
   isInList(accountName: string): boolean {
