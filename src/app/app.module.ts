@@ -51,6 +51,7 @@ import { SearchTaskByNameComponent } from './components/search-task-by-name/sear
 import { ManageTaskComponent } from './page/manage-task/manage-task.component';
 import { TaskReportComponent } from './page/task-report/task-report.component'
 import { DatePipe } from '@angular/common';
+import { ProductCounterComponent } from './components/product-counter/product-counter.component';
 
 export const options: Partial<IConfig> | (() => Partial<IConfig>) = {};
 
@@ -97,7 +98,8 @@ export const options: Partial<IConfig> | (() => Partial<IConfig>) = {};
     SlotViewComponent,
     SearchTaskByNameComponent,
     ManageTaskComponent,
-    TaskReportComponent
+    TaskReportComponent,
+    ProductCounterComponent
   ],
   imports: [
     BrowserModule,
