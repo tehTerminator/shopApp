@@ -96,6 +96,7 @@ export class CalendarViewComponent implements OnInit {
         andWhere: {
           'MONTH(postedOn)': this.month,
           'YEAR(postedOn)': this.year,
+          state: ['<>', 'REJECTED']
         },
         orWhere: {
           giver_id: this.selectedAccount,
