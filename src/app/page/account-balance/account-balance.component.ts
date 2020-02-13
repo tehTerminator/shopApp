@@ -25,6 +25,7 @@ export class AccountBalanceComponent implements OnInit {
 
   ngOnInit() {
     this.postedOn = this.datePipe.transform(new Date(), 'yyyy-MM-dd');
+    this.get();
     this.reset();
   }
 
@@ -48,9 +49,9 @@ export class AccountBalanceComponent implements OnInit {
 
   save() {
 
-    const filteredAccount = this.data.find( x => x.account_id === this.selectedAccount );
+    const filteredAccount = this.data.find( x => +x.account_id === +this.selectedAccount );
+    console.log( filteredAccount );
     if (filteredAccount !== undefined ) {
-      filteredAccount.openingBalance = this.balance;
       this.mysql.update('balance', {
         andWhere: {
           postedOn: this.postedOn,
@@ -66,30 +67,27 @@ export class AccountBalanceComponent implements OnInit {
             ${this.directory.get(this.selectedAccount).name} at ${this.postedOn} is = ${filteredAccount.openingBalance}`,
           state: 'green'
         });
+        this.get();
+        this.reset();
       });
-      this.reset();
-      return;
+    } else {
+      this.mysql.insert('balance', {
+        userData: {
+          postedOn: this.postedOn,
+          account_id: this.selectedAccount,
+          openingBalance: this.balance
+        }
+      }, true).subscribe((res: any) => {
+        console.log(res);
+        this.notice.changeMessage({
+          text: `SET Opening Balance ${this.postedOn} - ${this.directory.get(this.selectedAccount).name} = ${this.balance}`,
+          state: 'green'
+        });
+        this.get();
+        this.reset();
+      });
     }
 
-    this.mysql.insert('balance', {
-      userData: {
-        postedOn: this.postedOn,
-        account_id: this.selectedAccount,
-        openingBalance: this.balance
-      }
-    }, true).subscribe((res: any) => {
-      this.notice.changeMessage({
-        text: `SET Opening Balance ${this.postedOn} - ${this.directory.get(this.selectedAccount).name} = ${this.balance}`,
-        state: 'green'
-      });
-      this.data.push({
-        postedOn: this.postedOn,
-        account_id: this.selectedAccount,
-        accountName: this.directory.get(+this.selectedAccount).name,
-        openingBalance: this.balance
-      });
-      this.reset();
-    });
   }
 
   reset() {
