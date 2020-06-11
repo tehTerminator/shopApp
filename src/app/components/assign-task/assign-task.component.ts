@@ -11,7 +11,7 @@ import { Component, OnInit, ViewChild, ElementRef } from '@angular/core';
   styleUrls: ['./assign-task.component.css']
 })
 export class AssignTaskComponent implements OnInit {
-  @ViewChild('id', { static: false }) idField: ElementRef;
+  @ViewChild('id') idField: ElementRef;
   taskId: number;
   task: Task;
   selectedUserId: number;

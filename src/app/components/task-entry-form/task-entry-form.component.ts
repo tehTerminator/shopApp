@@ -15,7 +15,7 @@ import { DatePipe } from '@angular/common';
   styleUrls: ['./task-entry-form.component.css']
 })
 export class TaskEntryFormComponent implements OnInit {
-  @ViewChild('name', { static: false }) nameField: ElementRef;
+  @ViewChild('name') nameField: ElementRef;
   selectedBatch = 0;
   batch: Array<Batch> = [];
   suggestion: Array<string> = [];

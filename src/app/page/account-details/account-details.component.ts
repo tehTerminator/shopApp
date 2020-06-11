@@ -12,7 +12,7 @@ import { DatePipe } from '@angular/common';
   providers: [DatePipe]
 })
 export class AccountDetailsComponent implements OnInit {
-  @ViewChild('amount', { static: false }) amountField: ElementRef;
+  @ViewChild('amount') amountField: ElementRef;
   transactions: Array<CashTransaction> = [];
   selectedAccount: number;
   fromDate = '';
