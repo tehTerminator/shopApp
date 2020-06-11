@@ -5,7 +5,6 @@ import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
 
 import { AppComponent } from './app.component';
 
-export const options: Partial<IConfig> | (() => Partial<IConfig>) = {};
 
 @NgModule({
   declarations: [
@@ -15,7 +14,6 @@ export const options: Partial<IConfig> | (() => Partial<IConfig>) = {};
     BrowserModule,
     HttpClientModule,
     BrowserAnimationsModule,
-    NgxMaskModule.forRoot(options)
   ],
   providers: [],
   bootstrap: [AppComponent]

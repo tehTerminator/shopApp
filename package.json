@@ -23,6 +23,7 @@
     "@angular/router": "~9.1.11",
     "bootstrap": "^4.3.1",
     "core-js": "^2.6.9",
+    "fomantic-ui-css": "^2.8.5",
     "ngx-mask": "^7.9.10",
     "popper.js": "^1.15.0",
     "rxjs": "~6.5.5",
